@@ -6,6 +6,9 @@ Projet de moteur de jeux dans le cadre de l'UE Moteur de jeux [HAI819I](https://
 
 Étape 0 :
 Ce placer dans le dossier ```\code``` :
+```console
+cd code
+```
 
 Étape 1 :
 Créer un dossier où build l'application
