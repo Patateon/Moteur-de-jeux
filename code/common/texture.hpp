@@ -1,18 +1,19 @@
 #ifndef TEXTURE_HPP
 #define TEXTURE_HPP
 
+
+// Texture en niveau de gris
 GLuint loadTexture2DGrayFromFilePath(const std::string& path, int *min_value, int *max_value);
 
+// Texture couleur
 GLuint loadTexture2DFromFilePath(const std::string& path);
 
+// Setup les paramètres de la texture de base (Interpolation ou non, etc.)
 void setDefaultTexture2DParameters(GLuint texture);
 
 // Load a .BMP file using our custom loader
 GLuint loadBMP_custom(const char * imagepath);
 
-//// Since GLFW 3, glfwLoadTexture2D() has been removed. You have to use another texture loading library, 
-//// or do it yourself (just like loadBMP_custom and loadDDS)
-//// Load a .TGA file using GLFW's own loader
 //GLuint loadTGA_glfw(const char * imagepath);
 
 // Load a .DDS file using GLFW's own loader

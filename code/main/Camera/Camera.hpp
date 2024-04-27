@@ -11,9 +11,16 @@
 #define MAX_PITCH 89.0f
 #define epsilon 0.1f
 
-static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
+//// Fonction statique pour la gestion des contrôles de la caméra
+
+// Pour les contrôles "fluides" se faisant en même temps que le rendu (ex : WASD/ZQSD, etc.)
 static void processInput(GLFWwindow* window);
+
+// Callback pour les input plus précis (Toggle un truc, etc.)
 static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+// Callback pour la position du cursor (ex : rotation de la caméra, etc.)
+static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 
 class Camera
 {
@@ -21,9 +28,15 @@ public:
 
     void init();
     void update(float _deltaTime, GLFWwindow* _window);
+
+    // ImGui (Faire mieux)
     void updateInterface(float _deltaTime);
+    // ImGui onglet caméra
     void updateCameraSettingsInterface(float _deltaTime);
+    // Réinitialiser la pos de la camera
     void resetCameraPos();
+    // Appel les trois fonction de contrôles de la caméra
+    // et bloque si conflit avec ImGui
     void allInputs(GLFWwindow* _window);
     void updateFreeInput(float _deltaTime, GLFWwindow* _window);
     void computeFinalView();
@@ -34,7 +47,7 @@ public:
 
     glm::vec3 pathReset();
 
-    // Reference getters
+    // Reference getters (À mieux faire)
     glm::vec3 & getPosition() {return m_position;}
     glm::vec3 & getEulerAngle() {return m_eulerAngle;}
     glm::vec3 & getFirstPositionReset() {return m_first_pos_reset;}

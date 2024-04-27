@@ -14,10 +14,10 @@
 // Others
 #include "transform.hpp"
 
-void Node::move(){
-    this->transform.translation = this->movement.position;
-    this->updateSelfAndChild();
-}
+
+/*===============
+Transform methods
+===============*/
 
 glm::mat4 Transform::getLocalModel(){
 
@@ -44,12 +44,24 @@ glm::mat4 Transform::getLocalModel(){
         rotation * glm::scale(glm::mat4(1.0f), scale);
 }
 
-void Node::addChild(Node * child){
+
+/*============
+Entity methods
+============*/
+
+void Entity::move(){
+    this->transform.translation = this->movement.position;
+    this->updateSelfAndChild();
+}
+
+
+void Entity::addChild(Entity * child){
     children.emplace_back(child);
     children.back()->parent = this;
 }
 
-void Node::updateSelfAndChild()
+
+void Entity::updateSelfAndChild()
 {
     if (parent)
         transform.model = parent->transform.model * 

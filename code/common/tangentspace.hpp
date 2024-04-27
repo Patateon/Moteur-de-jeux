@@ -1,6 +1,8 @@
 #ifndef TANGENTSPACE_HPP
 #define TANGENTSPACE_HPP
 
+
+// ???
 void computeTangentBasis(
     // inputs
     std::vector<glm::vec3> & vertices,

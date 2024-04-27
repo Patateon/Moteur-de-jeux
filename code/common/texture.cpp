@@ -10,6 +10,7 @@
 #include "stb_image.h"
 #include "texture.hpp"
 
+
 GLuint loadTexture2DGrayFromFilePath(const std::string& path, int *min_value, int *max_value) {
 	GLuint texture;
 	glGenTextures(1, &texture);

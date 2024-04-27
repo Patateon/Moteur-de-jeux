@@ -7,8 +7,8 @@
 #include <vector>
 #include "mesh.hpp"
 
-// Class Transform
-
+// Structure pour la gestion du mouvement avec les vecteurs positions, vitesse
+// et accélération, ainsi que la masse. À modifier selon les besoins
 struct Movement{
     float masse = 1.0f;
 
@@ -17,6 +17,13 @@ struct Movement{
     glm::vec3 acceleration = glm::vec3();
 };
 
+//// Class Transform
+// 3 vecteurs publiques pour la translation, la rotation et la mise à l'échelle.
+// Angle d'eulers en entrée pour la rotation puis rotation par matrice dans
+// l'ordre Pitch, Yaw, Roll en degrés.
+// Pour calculer la matrice model local après avoir modifier les 3 vecteurs, getLocalModel()
+// Pour calculer la matrice model dans le repère monde il faut passer la class
+// Entity décrite plus loin et sa méthode updateSelfAndChild()
 class Transform
 {
 public:
@@ -32,29 +39,41 @@ public:
     glm::mat4 getLocalModel();
 };
 
-class Node
+//// Class Entity
+// Stocke une entity de la scène et permet l'attribution d'enfant 
+// ayant une position relatif à celle-ci (Scène graphe mais aussi pour de simples objets)
+// Une entité se définit par une maillage, une transformation et une mouvement.
+class Entity
 {
 public:
-    Node(){}
+    Entity(){}
     // Scene graph
-    std::vector<Node*> children;
-    Node* parent = nullptr;
+    std::vector<Entity*> children;
+    Entity* parent = nullptr;
 
     // Global and local space informations
     Transform transform;
 
+    // Mouvement de l'objet (À tester l'impact selon le repère local ou monde ?)
     Movement movement;
 
-    // Objects informations
-    Mesh * mesh;
+    // Maillage de l'objet
+    Mesh* mesh;
 
-    void setMesh(Mesh * mesh) {this->mesh = mesh;}
-    Mesh * getMesh() {return this->mesh;}
+    // Attribue un mmailge à une entity, possibilité de le modifier runtime
+    // (L'appel à init est supposé ainsi que les appels à recomputeNormals et TexCoord)
+    void setMesh(Mesh* mesh) {this->mesh = mesh;}
 
+    // Renvoie le maillage par référence (Donc effet de bord donc équivalent Setter)
+    Mesh* getMesh() {return this->mesh;}
+
+    // Actualiser le mouvement, (Modifie la matrice model en conséquence)
     void move();
 
-    void addChild(Node * child);
+    // Ajoute un enfant relatif à l'objet
+    void addChild(Entity * child);
 
+    // Met à jour les matrices models global de chaque enfant de l'entité
     void updateSelfAndChild();
 };
 
