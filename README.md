@@ -2,7 +2,7 @@
 
 Projet de moteur de jeux dans le cadre de l'UE Moteur de jeux [HAI819I](https://moodle.umontpellier.fr/course/view.php?id=25797)
 
-# Installation
+# Installation et Utilisation
 
 Étape 0 :
 Ce placer dans le dossier ```\code``` :
