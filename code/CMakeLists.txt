@@ -1,6 +1,6 @@
 # CMake entry point
 cmake_minimum_required (VERSION 3.0)
-project (TP6Camera)
+project (Moteur-de-jeux)
 
 find_package(OpenGL REQUIRED)
 
@@ -58,6 +58,12 @@ file( GLOB IMGUIC imgui/*.cpp)
 file( GLOB IMGUIH imgui/*.h) 
 add_executable(main
     main/main.cpp
+	common/stb_image.cpp
+	common/stb_image.h
+    common/mesh.cpp
+    common/mesh.hpp
+    common/transform.cpp
+    common/transform.hpp
     common/shader.cpp
     common/shader.hpp
     common/texture.cpp

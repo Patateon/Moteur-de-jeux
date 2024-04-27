@@ -1,10 +1,72 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
+#include <stdexcept>
 
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
+#include "stb_image.h"
+#include "texture.hpp"
+
+GLuint loadTexture2DGrayFromFilePath(const std::string& path, int *min_value, int *max_value) {
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	int width = 0;
+	int height = 0;
+	int channels = 3;
+	(*min_value) = 255;
+	(*max_value) = 0;
+	unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 1);
+	if (!data) {
+		stbi_image_free(data);
+		throw std::runtime_error("Failed to load texture: " + path);
+	}
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, data);
+	for (int i = 0; i<width*height; i++){
+		if ((*min_value)>(int) data[i]){
+			(*min_value) = (int) data[i];
+		}else if ((*max_value)<(int) data[i]){
+			(*max_value) = (int) data[i];
+		}
+	}
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(data);
+	setDefaultTexture2DParameters(texture);
+	return texture;
+}
+
+
+GLuint loadTexture2DFromFilePath(const std::string& path) {
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	int width = 0;
+	int height = 0;
+	int channels = 3;
+	unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+	if (!data) {
+		stbi_image_free(data);
+		throw std::runtime_error("Failed to load texture: " + path);
+	}
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(data);
+	setDefaultTexture2DParameters(texture);
+	return texture;
+}
+
+void setDefaultTexture2DParameters(GLuint texture) {
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+}
 
 
 GLuint loadBMP_custom(const char * imagepath){

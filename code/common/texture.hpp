@@ -1,6 +1,12 @@
 #ifndef TEXTURE_HPP
 #define TEXTURE_HPP
 
+GLuint loadTexture2DGrayFromFilePath(const std::string& path, int *min_value, int *max_value);
+
+GLuint loadTexture2DFromFilePath(const std::string& path);
+
+void setDefaultTexture2DParameters(GLuint texture);
+
 // Load a .BMP file using our custom loader
 GLuint loadBMP_custom(const char * imagepath);
 

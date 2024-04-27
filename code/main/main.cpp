@@ -33,13 +33,8 @@ using namespace glm;
 #include <common/vboindexer.hpp>
 #include <common/texture.hpp>
 
-#ifdef _WINDOWS
-
-#include <windows.h>
-#else
 #include <unistd.h>
 #define Sleep(x) usleep((x)*1000)
-#endif
 
 // settings
 const unsigned int SCR_WIDTH = 800;
