@@ -33,6 +33,6 @@ Lancer avec :
 ```console
 ./launch-main.sh
 ```
-# Objectifs :
+# Objectif :
 
 https://github.com/Patateon/Moteur-de-jeux/assets/92885323/c1377596-78a8-4737-98aa-29a196405e77
