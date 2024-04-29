@@ -61,7 +61,7 @@ int main(void)
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
-    GLuint programID = LoadShaders("vertex_shader.glsl", "fragment_shader.glsl");
+    GLuint programID = LoadShaders("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
     GLuint ViewMatrixID = glGetUniformLocation(programID, "V");
     GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
@@ -75,8 +75,8 @@ int main(void)
     ObjController map;
     Actor target;
 
-    map.loadObj("obj/myMap2.obj", glm::vec3(0.6f, 0.5f, 0.3f), colorID);
-    target.load("obj/cameraTarget.obj", glm::vec3(0.8f, 0.5f, 0.4f), colorID);
+    map.loadObj("../assets/myMap2.obj", glm::vec3(0.6f, 0.5f, 0.3f), colorID);
+    target.load("../assets/cameraTarget.obj", glm::vec3(0.8f, 0.5f, 0.4f), colorID);
 
 
     glUseProgram(programID);
