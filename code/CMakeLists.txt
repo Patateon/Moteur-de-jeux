@@ -26,6 +26,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/rpavlik-cmake-module
 include(CreateLaunchers)
 include(MSVCMultipleProcessCompile) # /MP
 
+# Pour faire fonctionner clang (pas nécessaire sans clang)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+
 if(INCLUDE_DISTRIB)
     add_subdirectory(distrib)
 endif(INCLUDE_DISTRIB)
@@ -58,22 +62,24 @@ file( GLOB IMGUIC imgui/*.cpp)
 file( GLOB IMGUIH imgui/*.h) 
 add_executable(main
     main/main.cpp
-	common/stb_image.cpp
-	common/stb_image.h
+    common/entity.cpp
+    common/entity.hpp
     common/mesh.cpp
     common/mesh.hpp
-    common/transform.cpp
-    common/transform.hpp
-    common/shader.cpp
-    common/shader.hpp
-    common/texture.cpp
-    common/texture.hpp
     common/objloader.cpp
     common/objloader.hpp
-    common/vboindexer.cpp
-    common/vboindexer.hpp
     common/quaternion_utils.cpp
     common/quaternion_utils.hpp
+    common/shader.cpp
+    common/shader.hpp
+	common/stb_image.cpp
+	common/stb_image.h
+    common/texture.cpp
+    common/texture.hpp
+    common/transform.cpp
+    common/transform.hpp
+    common/vboindexer.cpp
+    common/vboindexer.hpp
 
     main/Actor/Actor.cpp
     main/Actor/Actor.hpp

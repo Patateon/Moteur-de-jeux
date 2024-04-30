@@ -12,12 +12,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 // Others
-#include "transform.hpp"
+#include <common/transform.hpp>
 
-
-/*===============
-Transform methods
-===============*/
 
 glm::mat4 Transform::getLocalModel(){
 
@@ -42,35 +38,4 @@ glm::mat4 Transform::getLocalModel(){
     // Scale -> Rotate -> Translate
     return glm::translate(glm::mat4(1.0f), translation) *
         rotation * glm::scale(glm::mat4(1.0f), scale);
-}
-
-
-/*============
-Entity methods
-============*/
-
-void Entity::move(){
-    this->transform.translation = this->movement.position;
-    this->updateSelfAndChild();
-}
-
-
-void Entity::addChild(Entity * child){
-    children.emplace_back(child);
-    children.back()->parent = this;
-}
-
-
-void Entity::updateSelfAndChild()
-{
-    if (parent)
-        transform.model = parent->transform.model * 
-            transform.getLocalModel();
-    else
-        transform.model = transform.getLocalModel();
-
-    for (auto&& child : children)
-    {
-        child->updateSelfAndChild();
-    }
 }

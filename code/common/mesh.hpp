@@ -1,12 +1,12 @@
 #pragma once
 
-#include <string.h>
+#include <string>
 #include <vector>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-#include "texture.hpp"
+#include <common/texture.hpp>
 
 class Mesh
 {

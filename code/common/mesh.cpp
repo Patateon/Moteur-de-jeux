@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "mesh.hpp"
+#include <common/mesh.hpp>
 
 Mesh::Mesh(
     std::vector<glm::vec3> vertices,
