@@ -1,5 +1,4 @@
-#ifndef MESH_H
-#define MESH_H
+#pragma once
 
 #include <string.h>
 #include <vector>
@@ -83,5 +82,3 @@ public:
     // Clear after the mainloop
     void clear();
 };
-
-#endif

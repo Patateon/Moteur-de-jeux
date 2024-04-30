@@ -1,5 +1,4 @@
-#ifndef OBJLOADER_H
-#define OBJLOADER_H
+#pragma once
 #include <string>
 
 
@@ -31,5 +30,3 @@ bool loadOFF( const std::string & filename ,
     std::vector< unsigned short > & indices,
     std::vector< std::vector<unsigned short > > & triangles
 );
-
-#endif
