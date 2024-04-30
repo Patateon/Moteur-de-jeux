@@ -86,8 +86,8 @@ add_executable(main
     main/Actor/ObjController.cpp
     main/Actor/ObjController.hpp
     
-    main/vertex_shader.glsl
-    main/fragment_shader.glsl
+    main/shaders/vertex_shader.glsl
+    main/shaders/fragment_shader.glsl
         ${IMGUIH}
         ${IMGUIC}
 )
