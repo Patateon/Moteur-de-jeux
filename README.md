@@ -5,7 +5,7 @@ Projet de moteur de jeux dans le cadre de l'UE Moteur de jeux [HAI819I](https://
 # Installation et Utilisation
 
 Étape 0 :
-Ce placer dans le dossier ```\code``` :
+Ce placer dans le dossier ```code``` :
 ```console
 cd code
 ```
@@ -33,3 +33,6 @@ Lancer avec :
 ```console
 ./launch-main.sh
 ```
+# Objectif :
+
+https://github.com/Patateon/Moteur-de-jeux/assets/92885323/c1377596-78a8-4737-98aa-29a196405e77

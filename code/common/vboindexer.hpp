@@ -1,5 +1,4 @@
-#ifndef VBOINDEXER_HPP
-#define VBOINDEXER_HPP
+#pragma once
 
 void indexVBO(
     std::vector<glm::vec3> & in_vertices,
@@ -27,5 +26,3 @@ void indexVBO_TBN(
     std::vector<glm::vec3> & out_tangents,
     std::vector<glm::vec3> & out_bitangents
 );
-
-#endif
