@@ -1,5 +1,4 @@
-#ifndef TRANSFORM_HPP
-#define TRANSFORM_HPP
+#pragma once
 
 #include <glm/glm.hpp>
 // #include <GL/glew.h>
@@ -76,5 +75,3 @@ public:
     // Met à jour les matrices models global de chaque enfant de l'entité
     void updateSelfAndChild();
 };
-
-#endif

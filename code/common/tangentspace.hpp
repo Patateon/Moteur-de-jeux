@@ -1,6 +1,4 @@
-#ifndef TANGENTSPACE_HPP
-#define TANGENTSPACE_HPP
-
+#pragma once
 
 // ???
 void computeTangentBasis(
@@ -12,6 +10,3 @@ void computeTangentBasis(
     std::vector<glm::vec3> & tangents,
     std::vector<glm::vec3> & bitangents
 );
-
-
-#endif
