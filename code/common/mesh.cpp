@@ -1,4 +1,5 @@
 
+#include "main/Actor/ObjController.hpp"
 #include <common/mesh.hpp>
 
 Mesh::Mesh(
@@ -20,13 +21,13 @@ void Mesh::recomputeNormals() {
 
     for(unsigned int tIt = 0; tIt < m_triangleIndices.size(); tIt+=3) {
         glm::uvec3 t = glm::uvec3(m_triangleIndices[tIt], m_triangleIndices[tIt+1], m_triangleIndices[tIt+2]);
-        glm::vec3 n_t = glm::cross( m_vertexPositions[t[1]] - m_vertexPositions[t[0]] , m_vertexPositions[t[2]] - m_vertexPositions[t[0]] );
+        glm::vec3 n_t = glm::cross(m_vertexPositions[t[2]] - m_vertexPositions[t[0]], m_vertexPositions[t[1]] - m_vertexPositions[t[0]]);
         m_vertexNormals[ t[0] ] += n_t;
         m_vertexNormals[ t[1] ] += n_t;
         m_vertexNormals[ t[2] ] += n_t;
     }
     for(unsigned int nIt = 0; nIt < m_vertexNormals.size(); ++nIt) {
-        glm::normalize( m_vertexNormals[nIt] );
+        m_vertexNormals[nIt] = glm::normalize(m_vertexNormals[nIt]);
     }
 }
 
@@ -101,7 +102,16 @@ void Mesh::init() {
     glBindVertexArray(0);
 }
 
-void Mesh::render() {
+void Mesh::render(GLuint _colorID, GLuint _hasTextureID) {
+
+    glUniform1i(_hasTextureID, m_has_texture);
+
+    if(m_has_texture){
+        glBindTexture(GL_TEXTURE_2D, m_texture);
+    }else{
+        glUniform3f(_colorID, m_color.x, m_color.y, m_color.z);
+    }
+
     glBindVertexArray(m_vao);
     glDrawElements(
         GL_TRIANGLES, 

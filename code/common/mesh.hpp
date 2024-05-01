@@ -75,7 +75,7 @@ public:
     // Init before de mainloop
     void init();
     // Render each loop
-    void render();
+    void render(GLuint _colorID, GLuint _hasTextureID);
     // Clear after the mainloop
     void clear();
 };

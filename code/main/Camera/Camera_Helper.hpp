@@ -8,8 +8,6 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/norm.hpp>
 
-#include <iostream>
-
 #define SMOOTHSTEP(x) ((x) * (x) * (3 - 2 * (x)))
 
 static glm::vec3 VEC_ZERO{ 0.f,0.f,0.f };

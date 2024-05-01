@@ -1,5 +1,6 @@
 // Include standard headers
 #include "common/heightmap.hpp"
+#include "glm/detail/type_vec.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -8,6 +9,7 @@
 
 // Include GLFW
 #include <GLFW/glfw3.h>
+#include <sys/types.h>
 GLFWwindow* window;
 
 // Include GLM
@@ -64,30 +66,35 @@ int main(void)
     GLuint ViewMatrixID = glGetUniformLocation(programID, "V");
     GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
     GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
+    GLuint hasTextureID = glGetUniformLocation(programID, "hasTexture");
     GLuint colorID = glGetUniformLocation(programID, "color_Mesh");
+    GLuint textureID = glGetUniformLocation(programID, "texture_Mesh");
 
     /****************************************/  
 
 
     //Chargement du fichier de maillage
-    ObjController map;
-    Actor target;
+    // ObjController map;
+    // Actor target;
 
     Rectangle rec;
-    rec.bottomLeft = glm::vec3(-5.0f, 0.0, -5.0f);
-    rec.right = glm::vec3(10.0f, 0.0f, 0.0f);
-    rec.up = glm::vec3(0.0f, 0.0f, 10.0f);
+    rec.bottomLeft = glm::vec3(-75.0f, 0.0, -75.0f);
+    rec.right = glm::vec3(150.0f, 0.0f, 0.0f);
+    rec.up = glm::vec3(0.0f, 0.0f, 150.0f);
     std::string hMapTex = std::string("../assets/map/heightmap-1024x1024.png");
     HeightMap hMap = HeightMap(rec, 30, 30, hMapTex);
     hMap.build(30, 30);
     hMap.currentMesh().hasTexture(false);
     hMap.currentMesh().color(glm::vec3(0.5f, 0.0f, 0.0f));
+    
+    hMap.currentMesh().toggleTexture();
+    hMap.currentMesh().texture("../assets/map/grass.png");
     hMap.loadEntity();
 
-    glBindVertexArray(VertexArrayID);
-    map.loadObj("../assets/myMap2.obj", glm::vec3(0.6f, 0.5f, 0.3f), colorID);
-    target.load("../assets/cameraTarget.obj", glm::vec3(0.8f, 0.5f, 0.4f), colorID);
 
+    // glBindVertexArray(VertexArrayID);
+    // map.loadObj("../assets/myMap2.obj", glm::vec3(0.6f, 0.5f, 0.3f), colorID);
+    // target.load("../assets/cameraTarget.obj", glm::vec3(0.8f, 0.5f, 0.4f), colorID);
 
     glUseProgram(programID);
 
@@ -128,7 +135,7 @@ int main(void)
         ImGui::NewFrame();
 
         // Update
-        target.update(deltaTime, window, myCamera.getRotation());
+        // target.update(deltaTime, window, myCamera.getRotation());
         myCamera.update(deltaTime, window);
 
 
@@ -140,9 +147,9 @@ int main(void)
 
         // map.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID);
         glUniform3f(colorID, hMap.currentMesh().color()[0], hMap.currentMesh().color()[1], hMap.currentMesh().color()[2]);
-        hMap.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID);
+        hMap.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID, colorID, hasTextureID);
         glBindVertexArray(VertexArrayID);
-        target.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID); 
+        // target.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID); 
 
         // Renders the ImGUI elements
         ImGui::Render();
@@ -171,9 +178,9 @@ int main(void)
     glDeleteProgram(programID);
     //glDeleteTextures(1, &Texture);
     glDeleteVertexArrays(1, &VertexArrayID);
-    map.deleteBuffer();
+    // map.deleteBuffer();
     hMap.clear();
-    target.destroy();
+    // target.destroy();
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
 
@@ -257,7 +264,7 @@ void windowSetup()
     glDepthFunc(GL_LESS);
 
     // Cull triangles which normal is not towards the camera
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
 }
 
 void initImgui()

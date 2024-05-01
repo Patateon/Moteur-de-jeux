@@ -1,5 +1,6 @@
 
 // Others
+#include "main/Actor/ObjController.hpp"
 #include <common/transform.hpp>
 #include <common/entity.hpp>
 
@@ -37,7 +38,7 @@ void Entity::loadEntity(){
     currentMesh().init();
 }
 
-void Entity::updateViewAndDraw(const Camera& _camera, GLuint _matrixID, GLuint _modelMatrixID){
+void Entity::updateViewAndDraw(const Camera& _camera, GLuint _matrixID, GLuint _modelMatrixID, GLuint _colorID, GLuint _hasTextureID){
     glm::mat4 projectionMatrix = _camera.getProjectionMatrix();
     glm::mat4 viewMatrix = _camera.getViewMatrix();
     glm::mat4 modelMatrix = m_transform.getLocalModel();
@@ -47,7 +48,7 @@ void Entity::updateViewAndDraw(const Camera& _camera, GLuint _matrixID, GLuint _
     // in the "MVP" uniform
     glUniformMatrix4fv(_matrixID, 1, GL_FALSE, &MVP[0][0]);
     glUniformMatrix4fv(_modelMatrixID, 1, GL_FALSE, &modelMatrix[0][0]);
-    currentMesh().render();
+    currentMesh().render(_colorID, _hasTextureID);
 }
 
 void Entity::clear(){

@@ -9,6 +9,8 @@
 
 #include <common/mesh.hpp>
 
+#define MAX_HEIGHT 30.0f
+
 struct Rectangle{
     glm::vec3 bottomLeft;
     glm::vec3 up;
@@ -18,10 +20,8 @@ struct Rectangle{
 class HeightMap : public Entity
 {
 private:
+    float m_maxHeight = 10.f;
     Rectangle m_map;
-
-    // Mesh m_currentMesh;
-
     std::string m_heightMapTexture;
 public:
     
@@ -38,6 +38,10 @@ public:
     void build(int hRes, int vRes);
     
     void applyHeightMap();
+
+    float maxHeight() const { return m_maxHeight; }
+    void maxHeight(float maxH) { m_maxHeight = maxH; }
+    
  
     Rectangle map() const { return m_map; }
     void map(Rectangle map) { m_map = map; }

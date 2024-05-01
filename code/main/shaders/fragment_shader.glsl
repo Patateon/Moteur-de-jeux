@@ -11,10 +11,11 @@ in vec3 LightDirection_cameraspace;
 out vec3 color;
 
 // Values that stay constant for the whole mesh.
-uniform sampler2D myTextureSampler;
+uniform sampler2D texture_Mesh;
 uniform mat4 MV;
 uniform vec3 LightPosition_worldspace;
 uniform vec3 color_Mesh;
+uniform int hasTexture;
 
 void main(){
 
@@ -24,7 +25,12 @@ void main(){
 	float LightPower = 100.0f;
 	
 	// Material properties
-	vec3 MaterialColor = color_Mesh;
+	vec3 MaterialColor;
+	if(hasTexture > 0){
+		MaterialColor = texture(texture_Mesh, UV).xyz;
+	}else{
+		MaterialColor = color_Mesh;
+	}
 
 	// Distance to the light
 	float distance = length( LightPosition_worldspace - Position_worldspace );

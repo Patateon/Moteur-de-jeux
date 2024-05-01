@@ -1,6 +1,7 @@
 #pragma once
 
 // Standard lib
+#include "main/Actor/ObjController.hpp"
 #include <vector>
 
 // Others
@@ -46,6 +47,6 @@ public:
 
     // Rendering function overload
     void loadEntity();
-    void updateViewAndDraw(const Camera& _camera, GLuint _matrixID, GLuint _modelMatrixID);
+    void updateViewAndDraw(const Camera& _camera, GLuint _matrixID, GLuint _modelMatrixID, GLuint _colorID, GLuint _hasTextureID);
     void clear();
 };

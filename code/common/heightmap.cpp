@@ -25,9 +25,9 @@ void HeightMap::build(int hRes, int vRes){
 
     generateSurface(&triangles, &vertices, m_map, hRes, vRes);
     currentMesh() = Mesh(vertices, triangles);
-    currentMesh().recomputeNormals();
     currentMesh().recomputeTextureCoordinates();
     applyHeightMap();
+    currentMesh().recomputeNormals();
 }
 
 void HeightMap::applyHeightMap() {
@@ -49,10 +49,10 @@ void HeightMap::applyHeightMap() {
 
         unsigned char* texel = data + (j + width * i) * nChannels;
         // raw height at coordinate
-        unsigned char y = texel[0];
+        float y = texel[0] / 255.f;
 
         // vertex
-     currentMesh().vertexPosition()[it].y = (float) y / 255.f;
+        currentMesh().vertexPosition()[it].y = y * m_maxHeight;
     }
 }
 
