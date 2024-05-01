@@ -27,13 +27,6 @@ GLuint loadTexture2DGrayFromFilePath(const std::string& path, int *min_value, in
 		throw std::runtime_error("Failed to load texture: " + path);
 	}
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, data);
-	for (int i = 0; i<width*height; i++){
-		if ((*min_value)>(int) data[i]){
-			(*min_value) = (int) data[i];
-		}else if ((*max_value)<(int) data[i]){
-			(*max_value) = (int) data[i];
-		}
-	}
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(data);
 	setDefaultTexture2DParameters(texture);

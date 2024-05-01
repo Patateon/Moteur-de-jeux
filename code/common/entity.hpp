@@ -4,8 +4,9 @@
 #include <vector>
 
 // Others
-#include <common/transform.hpp>
 #include <common/mesh.hpp>
+#include <common/transform.hpp>
+#include <main/Camera/Camera.hpp>
 
 
 //// Class Entity
@@ -26,17 +27,13 @@ private:
     Movement m_movement;
 
     // Maillage de l'objet
-    Mesh* m_currentMesh;
+    Mesh m_currentMesh;
 public:
     Entity(){}
-    Entity(Mesh* mesh);
+    Entity(Mesh mesh);
 
-    // Attribue un mmailge à une entity, possibilité de le modifier runtime
-    // (L'appel à init est supposé ainsi que les appels à recomputeNormals et TexCoord)
-    void setMesh(Mesh* mesh) {this->m_currentMesh = mesh;}
-
-    // Renvoie le maillage par référence (Donc effet de bord donc équivalent Setter)
-    Mesh* getMesh() {return this->m_currentMesh;}
+    Mesh & currentMesh() { return m_currentMesh; }
+    const Mesh & currentMesh() const { return m_currentMesh; }
 
     // Actualiser le mouvement, (Modifie la matrice model en conséquence)
     void move();
@@ -48,7 +45,7 @@ public:
     void updateSelfAndChild();
 
     // Rendering function overload
-    void init();
-    void render();
+    void loadEntity();
+    void updateViewAndDraw(const Camera& _camera, GLuint _matrixID, GLuint _modelMatrixID);
     void clear();
 };

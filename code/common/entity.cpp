@@ -3,8 +3,8 @@
 #include <common/transform.hpp>
 #include <common/entity.hpp>
 
-Entity::Entity(Mesh * mesh){
-    this->m_currentMesh = mesh;
+Entity::Entity(Mesh mesh){
+    m_currentMesh = mesh;
 }
 
 void Entity::move(){
@@ -33,15 +33,24 @@ void Entity::updateSelfAndChild()
     }
 }
 
-void Entity::init(){
-    this->getMesh()->init();
+void Entity::loadEntity(){
+    currentMesh().init();
 }
 
-void Entity::render(){
-    this->getMesh()->render();
+void Entity::updateViewAndDraw(const Camera& _camera, GLuint _matrixID, GLuint _modelMatrixID){
+    glm::mat4 projectionMatrix = _camera.getProjectionMatrix();
+    glm::mat4 viewMatrix = _camera.getViewMatrix();
+    glm::mat4 modelMatrix = m_transform.getLocalModel();
+    glm::mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
+
+    // Send our transformation to the currently bound shader, 
+    // in the "MVP" uniform
+    glUniformMatrix4fv(_matrixID, 1, GL_FALSE, &MVP[0][0]);
+    glUniformMatrix4fv(_modelMatrixID, 1, GL_FALSE, &modelMatrix[0][0]);
+    currentMesh().render();
 }
 
 void Entity::clear(){
     m_children.clear();
-    this->getMesh()->clear();
+    currentMesh().clear();
 }

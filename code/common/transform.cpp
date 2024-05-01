@@ -1,9 +1,6 @@
 
 // Include standard headers
-#include <stdio.h>
 #include <stdlib.h>
-#include <vector>
-#include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdlib>
 #include <ctime>

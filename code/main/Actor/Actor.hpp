@@ -1,8 +1,6 @@
 #pragma once
 // Include standard headers
-#include <stdio.h>
 #include <stdlib.h>
-#include <vector>
 
 #include <main/Actor/ObjController.hpp>
 #include <glm/gtc/matrix_transform.hpp>

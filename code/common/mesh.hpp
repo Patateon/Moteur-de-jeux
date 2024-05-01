@@ -22,7 +22,7 @@ private:
 	GLuint m_texture = 0;
 
     // Simple check to tell the fragment shader if the mesh has a texture
-    bool has_texture = false;
+    bool m_has_texture = false;
 
     // Vertices attributs arrays
 	std::vector<glm::vec3> m_vertexPositions;
@@ -56,29 +56,26 @@ public:
     glm::vec3 getBarycentre();
 
     // Permet d'attributer une texture à un maillage
-    bool getHasTexture() {return this->has_texture;}
-    void setHasTexture(bool has_texture) {this->has_texture = has_texture;}
+    bool hasTexture() const { return m_has_texture; }
+    void hasTexture(bool has_texture) { m_has_texture = has_texture; }
 
     // Permet d'attributer une couleur à un maillage
-    glm::vec3 getColor() {return this->m_color;}
-    void setColor(glm::vec3 color_in) {this->m_color = color_in;}
+    glm::vec3 color() const { return m_color; }
+    void color(glm::vec3 color) { m_color = color; }
 
     //// Indique si le maillage doit utiliser la texture ou la couleu
-    // Par défaut, le maillage utilise une couleur (has_texture = false)
-    void toggleTexture() {this->has_texture = ! this->has_texture;}
+    // Par défaut, le maillage utilise une couleur (m_has_texture = false)
+    void toggleTexture() {m_has_texture = ! m_has_texture;}
 
     // Textures
-    GLuint getTexture() {return this->m_texture;}
-    void setTexture(const std::string& path) {this->m_texture = loadTexture2DFromFilePath(path);}
+    GLuint texture() const {return m_texture;}
+    void texture(const std::string& path) {m_texture = loadTexture2DFromFilePath(path);}
 
     //// Fill buffers, renders with thoses buffers, clear them all
-
     // Init before de mainloop
     void init();
-
     // Render each loop
     void render();
-
     // Clear after the mainloop
     void clear();
 };

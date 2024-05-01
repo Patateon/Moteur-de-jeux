@@ -64,6 +64,8 @@ add_executable(main
     main/main.cpp
     common/entity.cpp
     common/entity.hpp
+    common/heightmap.cpp
+    common/heightmap.hpp
     common/mesh.cpp
     common/mesh.hpp
     common/objloader.cpp

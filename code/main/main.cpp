@@ -1,8 +1,7 @@
 // Include standard headers
+#include "common/heightmap.hpp"
 #include <stdio.h>
 #include <stdlib.h>
-#include <vector>
-#include <iostream>
 
 // Include GLEW
 #include <GL/glew.h>
@@ -14,7 +13,6 @@ GLFWwindow* window;
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 
 // Include GLM
 #include <imgui/imgui.h>
@@ -24,7 +22,7 @@ GLFWwindow* window;
 // Include Main
 #include <main/Actor/Actor.hpp>
 #include <main/Actor/ObjController.hpp>
-#include "main/Camera/Camera.hpp"
+#include <main/Camera/Camera.hpp>
 
 using namespace glm;
 
@@ -75,6 +73,18 @@ int main(void)
     ObjController map;
     Actor target;
 
+    Rectangle rec;
+    rec.bottomLeft = glm::vec3(-5.0f, 0.0, -5.0f);
+    rec.right = glm::vec3(10.0f, 0.0f, 0.0f);
+    rec.up = glm::vec3(0.0f, 0.0f, 10.0f);
+    std::string hMapTex = std::string("../assets/map/heightmap-1024x1024.png");
+    HeightMap hMap = HeightMap(rec, 30, 30, hMapTex);
+    hMap.build(30, 30);
+    hMap.currentMesh().hasTexture(false);
+    hMap.currentMesh().color(glm::vec3(0.5f, 0.0f, 0.0f));
+    hMap.loadEntity();
+
+    glBindVertexArray(VertexArrayID);
     map.loadObj("../assets/myMap2.obj", glm::vec3(0.6f, 0.5f, 0.3f), colorID);
     target.load("../assets/cameraTarget.obj", glm::vec3(0.8f, 0.5f, 0.4f), colorID);
 
@@ -128,7 +138,10 @@ int main(void)
         //View
         updateLightPosition(LightID);
 
-        map.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID);
+        // map.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID);
+        glUniform3f(colorID, hMap.currentMesh().color()[0], hMap.currentMesh().color()[1], hMap.currentMesh().color()[2]);
+        hMap.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID);
+        glBindVertexArray(VertexArrayID);
         target.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID); 
 
         // Renders the ImGUI elements
@@ -159,6 +172,7 @@ int main(void)
     //glDeleteTextures(1, &Texture);
     glDeleteVertexArrays(1, &VertexArrayID);
     map.deleteBuffer();
+    hMap.clear();
     target.destroy();
     // Close OpenGL window and terminate GLFW
     glfwTerminate();

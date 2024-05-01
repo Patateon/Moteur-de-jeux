@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+#include <GL/glew.h>
 
 // Texture en niveau de gris
 GLuint loadTexture2DGrayFromFilePath(const std::string& path, int *min_value, int *max_value);

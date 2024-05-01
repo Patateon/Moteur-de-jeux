@@ -1,6 +1,8 @@
 #pragma once
-#include <string>
 
+#include <string>
+#include <vector>
+#include <glm/glm.hpp>
 
 bool loadOBJ(
     const char * path, 
