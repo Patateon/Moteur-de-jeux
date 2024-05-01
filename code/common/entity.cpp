@@ -3,6 +3,8 @@
 #include "main/Actor/ObjController.hpp"
 #include <common/transform.hpp>
 #include <common/entity.hpp>
+//#include <reactphysics3d/reactphysics3d.h> 
+
 
 Entity::Entity(Mesh mesh){
     m_currentMesh = mesh;
@@ -11,6 +13,8 @@ Entity::Entity(Mesh mesh){
 void Entity::move(){
     this->m_transform.translation = this->m_movement.position;
     this->updateSelfAndChild();
+    //reactphysics3d::PhysicsCommon physicsCommon;
+    //reactphysics3d::PhysicsWorld* world = physicsCommon.createPhysicsWorld(); 
 }
 
 
