@@ -33,6 +33,8 @@ using namespace glm;
 #include <src/common/texture.hpp>
 #include <src/common/vboindexer.hpp>
 
+#include <src/physics/physicworld.hpp>
+
 #include <unistd.h>
 #define Sleep(x) usleep((x)*1000)
 
@@ -91,6 +93,9 @@ int main(void)
     hMap.currentMesh().toggleTexture();
     hMap.currentMesh().texture("../assets/map/grass.png");
     hMap.loadEntity();
+
+    PhysicWorld pworld;
+    pworld.test();
 
 
     // glBindVertexArray(VertexArrayID);

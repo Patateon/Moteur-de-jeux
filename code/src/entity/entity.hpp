@@ -22,7 +22,7 @@ private:
     Entity* m_parent = nullptr;
 
     // Global and local space informations
-    Transform m_transform;
+    transform::Transform m_transform;
 
     // Mouvement de l'objet (À tester l'impact selon le repère local ou monde ?)
     Movement m_movement;

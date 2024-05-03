@@ -11,6 +11,7 @@
 // Others
 #include <src/physics/transform.hpp>
 
+using namespace transform;
 
 glm::mat4 Transform::getLocalModel(){
 

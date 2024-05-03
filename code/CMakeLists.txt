@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.0)
 project (Moteur-de-jeux)
 
 find_package(OpenGL REQUIRED)
-# find_package(ReactPhysics3D REQUIRED) 
+find_package(ReactPhysics3D REQUIRED) 
 
 
 if( CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR )
@@ -111,7 +111,7 @@ add_executable(main
 target_link_libraries(main
     ${ALL_LIBS}
 )
-# target_link_libraries(main ReactPhysics3D::ReactPhysics3D)
+target_link_libraries(main ReactPhysics3D::ReactPhysics3D)
 # Xcode and Visual working directories
 set_target_properties(main PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/main/")
 create_target_launcher(main WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/main/")

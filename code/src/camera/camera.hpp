@@ -9,7 +9,8 @@
 #include <glm/gtx/norm.hpp>
 
 #define MAX_PITCH 89.0f
-#define epsilon 0.1f
+
+static float epsilon_camera = 0.1f;
 
 //// Fonction statique pour la gestion des contrôles de la caméra
 

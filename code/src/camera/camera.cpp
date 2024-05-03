@@ -100,7 +100,7 @@ void Camera::resetCameraPos(){
         m_current_time = glfwGetTime(); 
         float u = (m_current_time - m_init_time) / m_duration;
         vec3 path_reset = pathReset();
-        if (1 - u < epsilon){
+        if (1 - u < epsilon_camera){
             m_resetting = false;
             m_firstReset = false;
         }else{
