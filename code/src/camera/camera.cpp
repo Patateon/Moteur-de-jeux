@@ -1,11 +1,11 @@
-#include <main/Camera/Camera.hpp>
-#include <main/Camera/Camera_Helper.hpp>
+#include <src/camera/camera.hpp>
+#include <src/camera/camerahelper.hpp>
 
 
 // Include GLM
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
+#include <external/imgui/imgui.h>
+#include <external/imgui/imgui_impl_glfw.h>
+#include <external/imgui/imgui_impl_opengl3.h>
 
 using namespace glm;
 
@@ -100,7 +100,7 @@ void Camera::resetCameraPos(){
         m_current_time = glfwGetTime(); 
         float u = (m_current_time - m_init_time) / m_duration;
         vec3 path_reset = pathReset();
-        if (1 - u < epsilon){
+        if (1 - u < epsilon_camera){
             m_resetting = false;
             m_firstReset = false;
         }else{

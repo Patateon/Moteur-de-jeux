@@ -1,4 +1,4 @@
-#include <main/Actor/ObjController.hpp>
+#include <src/actor/objcontroller.hpp>
 
 
 void ObjController::loadObj(const char* _path, const glm::vec3& _color, GLuint _colorID)

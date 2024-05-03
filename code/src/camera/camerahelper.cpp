@@ -1,5 +1,4 @@
-#include <main/Camera/Camera_Helper.hpp>
-
+#include <src/camera/camerahelper.hpp>
 
 
 glm::vec3 Camera_Helper::quatToEuler(glm::quat _quat)

@@ -1,8 +1,8 @@
 
 // Others
-#include "main/Actor/ObjController.hpp"
-#include <common/transform.hpp>
-#include <common/entity.hpp>
+#include <src/actor/objcontroller.hpp>
+#include <src/physics/transform.hpp>
+#include <src/entity/entity.hpp>
 //#include <reactphysics3d/reactphysics3d.h> 
 
 

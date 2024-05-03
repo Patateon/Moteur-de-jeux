@@ -1,7 +1,6 @@
-#include "common/mesh.hpp"
-#include "glm/detail/type_vec.hpp"
-#include <common/heightmap.hpp>
-#include <common/stb_image.h>
+#include <src/common/mesh.hpp>
+#include <src/entity/heightmap.hpp>
+#include <src/common/stb_image.h>
 #include <iostream>
 #include <vector>
 using namespace std;

@@ -1,13 +1,13 @@
 #pragma once
 
 // Standard library
-#include "common/entity.hpp"
+#include <src/entity/entity.hpp>
 #include <string>
 
 // GLM
 #include <glm/glm.hpp>
 
-#include <common/mesh.hpp>
+#include <src/common/mesh.hpp>
 
 #define MAX_HEIGHT 30.0f
 

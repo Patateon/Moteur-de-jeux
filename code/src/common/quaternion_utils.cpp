@@ -1,4 +1,4 @@
-#include <common/quaternion_utils.hpp>
+#include <src/common/quaternion_utils.hpp>
 
 
 // Returns a glm::quaternion such that q*start = dest

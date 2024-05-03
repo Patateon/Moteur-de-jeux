@@ -3,7 +3,9 @@
 // GLM library
 #include <glm/glm.hpp>
 
-#include <common/mesh.hpp>
+#include <src/common/mesh.hpp>
+
+
 
 // Structure pour la gestion du mouvement avec les vecteurs positions, vitesse
 // et accélération, ainsi que la masse. À modifier selon les besoins
@@ -22,17 +24,19 @@ struct Movement{
 // Pour calculer la matrice model local après avoir modifier les 3 vecteurs, getLocalModel()
 // Pour calculer la matrice model dans le repère monde il faut passer la class
 // Entity décrite plus loin et sa méthode updateSelfAndChild()
-class Transform
-{
-public:
-    // Local Transform
-    glm::vec3 translation = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 eulerAngle = glm::vec3(0.0f, 0.0f, 0.0f); // Degrees
-    glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
+namespace transform {
+    class Transform
+    {
+    public:
+        // Local Transform
+        glm::vec3 translation = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 eulerAngle = glm::vec3(0.0f, 0.0f, 0.0f); // Degrees
+        glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
-    // Global Transfrom
-    glm::mat4 model = glm::mat4(1.0f);
+        // Global Transfrom
+        glm::mat4 model = glm::mat4(1.0f);
 
-    // Compute the model matrix in the local space
-    glm::mat4 getLocalModel();
+        // Compute the model matrix in the local space
+        glm::mat4 getLocalModel();
 };
+}

@@ -1,13 +1,13 @@
 #pragma once
 
 // Standard lib
-#include "main/Actor/ObjController.hpp"
+#include "src/actor/objcontroller.hpp"
 #include <vector>
 
 // Others
-#include <common/mesh.hpp>
-#include <common/transform.hpp>
-#include <main/Camera/Camera.hpp>
+#include <src/common/mesh.hpp>
+#include <src/physics/transform.hpp>
+#include <src/camera/camera.hpp>
 
 
 //// Class Entity
@@ -22,7 +22,7 @@ private:
     Entity* m_parent = nullptr;
 
     // Global and local space informations
-    Transform m_transform;
+    transform::Transform m_transform;
 
     // Mouvement de l'objet (À tester l'impact selon le repère local ou monde ?)
     Movement m_movement;
