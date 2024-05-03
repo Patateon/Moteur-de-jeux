@@ -6,7 +6,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-#include <common/texture.hpp>
+#include <src/common/texture.hpp>
 
 class Mesh
 {

@@ -1,11 +1,11 @@
-#include <main/Actor/Actor.hpp>
-#include <main/Camera/Camera_Helper.hpp>
-#include <common/quaternion_utils.hpp>
+#include <src/actor/actor.hpp>
+#include <src/camera/camerahelper.hpp>
+#include <src/common/quaternion_utils.hpp>
 
 // Include GLM
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
+#include <external/imgui/imgui.h>
+#include <external/imgui/imgui_impl_glfw.h>
+#include <external/imgui/imgui_impl_opengl3.h>
 
 
 void Actor::init()

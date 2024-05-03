@@ -3,10 +3,11 @@ cmake_minimum_required (VERSION 3.0)
 project (Moteur-de-jeux)
 
 find_package(OpenGL REQUIRED)
-find_package(ReactPhysics3D REQUIRED) 
+# find_package(ReactPhysics3D REQUIRED) 
+
 
 if( CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR )
-    message( FATAL_ERROR "Please select another Build Directory ! (and give it a clever name, like bin_Visual2012_64bits/)" )
+    message( FATAL_ERROR "Please select another Build Directory !" )
 endif()
 if( CMAKE_SOURCE_DIR MATCHES " " )
     message( "Your Source Directory contains spaces. If you experience problems when compiling, this can be the cause." )
@@ -14,7 +15,6 @@ endif()
 if( CMAKE_BINARY_DIR MATCHES " " )
     message( "Your Build Directory contains spaces. If you experience problems when compiling, this can be the cause." )
 endif()
-
 
 
 # Compile external dependencies 
@@ -58,51 +58,60 @@ add_definitions(
 )
 
 # main
-file( GLOB IMGUIC imgui/*.cpp) 
-file( GLOB IMGUIH imgui/*.h) 
+file( GLOB IMGUIC external/imgui/*.cpp) 
+file( GLOB IMGUIH external/imgui/*.h) 
 add_executable(main
     main/main.cpp
-    common/entity.cpp
-    common/entity.hpp
-    common/heightmap.cpp
-    common/heightmap.hpp
-    common/mesh.cpp
-    common/mesh.hpp
-    common/objloader.cpp
-    common/objloader.hpp
-    common/quaternion_utils.cpp
-    common/quaternion_utils.hpp
-    common/shader.cpp
-    common/shader.hpp
-	common/stb_image.cpp
-	common/stb_image.h
-    common/texture.cpp
-    common/texture.hpp
-    common/transform.cpp
-    common/transform.hpp
-    common/vboindexer.cpp
-    common/vboindexer.hpp
 
-    main/Actor/Actor.cpp
-    main/Actor/Actor.hpp
+    # Main components
+    src/common/mesh.cpp
+    src/common/mesh.hpp
+    src/common/objloader.cpp
+    src/common/objloader.hpp
+    src/common/quaternion_utils.cpp
+    src/common/quaternion_utils.hpp
+    src/common/shader.cpp
+    src/common/shader.hpp
+	src/common/stb_image.cpp
+	src/common/stb_image.h
+    src/common/texture.cpp
+    src/common/texture.hpp
+    src/common/vboindexer.cpp
+    src/common/vboindexer.hpp
 
-    main/Camera/Camera.cpp
-    main/Camera/Camera.hpp
-    main/Camera/Camera_Helper.cpp
-    main/Camera/Camera_Helper.hpp
+    # Entity Components
+    src/entity/entity.hpp
+    src/entity/entity.cpp
+    src/entity/heightmap.cpp
+    src/entity/heightmap.hpp
 
-    main/Actor/ObjController.cpp
-    main/Actor/ObjController.hpp
-    
-    main/shaders/vertex_shader.glsl
-    main/shaders/fragment_shader.glsl
+    # Physic engine
+    src/physics/physicworld.cpp
+    src/physics/physicworld.hpp
+    src/physics/transform.cpp
+    src/physics/transform.hpp
+
+    src/actor/actor.cpp
+    src/actor/actor.hpp
+    src/actor/objcontroller.cpp
+    src/actor/objcontroller.hpp
+
+    # Camera components
+    src/camera/camera.cpp
+    src/camera/camera.hpp
+    src/camera/camerahelper.cpp
+    src/camera/camerahelper.hpp
+
+    # Shaders parts
+    src/shaders/vertex_shader.glsl
+    src/shaders/fragment_shader.glsl
         ${IMGUIH}
         ${IMGUIC}
 )
 target_link_libraries(main
     ${ALL_LIBS}
 )
-target_link_libraries(main ReactPhysics3D::ReactPhysics3D)
+# target_link_libraries(main ReactPhysics3D::ReactPhysics3D)
 # Xcode and Visual working directories
 set_target_properties(main PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/main/")
 create_target_launcher(main WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/main/")

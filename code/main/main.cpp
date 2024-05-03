@@ -1,6 +1,4 @@
 // Include standard headers
-#include "common/heightmap.hpp"
-#include "glm/detail/type_vec.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,24 +12,26 @@ GLFWwindow* window;
 
 // Include GLM
 #include <glm/glm.hpp>
+#include <glm/detail/type_vec.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 // Include GLM
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
+#include <external/imgui/imgui.h>
+#include <external/imgui/imgui_impl_glfw.h>
+#include <external/imgui/imgui_impl_opengl3.h>
 
 // Include Main
-#include <main/Actor/Actor.hpp>
-#include <main/Actor/ObjController.hpp>
-#include <main/Camera/Camera.hpp>
+#include <src/actor/actor.hpp>
+#include <src/actor/objcontroller.hpp>
+#include <src/camera/camera.hpp>
 
 using namespace glm;
 
-#include <common/shader.hpp>
-#include <common/objloader.hpp>
-#include <common/vboindexer.hpp>
-#include <common/texture.hpp>
+#include <src/entity/heightmap.hpp>
+#include <src/common/objloader.hpp>
+#include <src/common/shader.hpp>
+#include <src/common/texture.hpp>
+#include <src/common/vboindexer.hpp>
 
 #include <unistd.h>
 #define Sleep(x) usleep((x)*1000)
@@ -61,7 +61,8 @@ int main(void)
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
-    GLuint programID = LoadShaders("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
+    GLuint programID = LoadShaders("../src/shaders/vertex_shader.glsl",
+                                    "../src/shaders/fragment_shader.glsl");
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
     GLuint ViewMatrixID = glGetUniformLocation(programID, "V");
     GLuint ModelMatrixID = glGetUniformLocation(programID, "M");

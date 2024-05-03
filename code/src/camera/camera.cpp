@@ -1,11 +1,11 @@
-#include <main/Camera/Camera.hpp>
-#include <main/Camera/Camera_Helper.hpp>
+#include <src/camera/camera.hpp>
+#include <src/camera/camerahelper.hpp>
 
 
 // Include GLM
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
+#include <external/imgui/imgui.h>
+#include <external/imgui/imgui_impl_glfw.h>
+#include <external/imgui/imgui_impl_opengl3.h>
 
 using namespace glm;
 

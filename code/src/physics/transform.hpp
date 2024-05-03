@@ -3,7 +3,7 @@
 // GLM library
 #include <glm/glm.hpp>
 
-#include <common/mesh.hpp>
+#include <src/common/mesh.hpp>
 
 // Structure pour la gestion du mouvement avec les vecteurs positions, vitesse
 // et accélération, ainsi que la masse. À modifier selon les besoins

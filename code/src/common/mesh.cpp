@@ -1,6 +1,6 @@
 
-#include "main/Actor/ObjController.hpp"
-#include <common/mesh.hpp>
+#include "src/actor/objcontroller.hpp"
+#include <src/common/mesh.hpp>
 
 Mesh::Mesh(
     std::vector<glm::vec3> vertices,

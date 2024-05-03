@@ -7,8 +7,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <common/texture.hpp>
-#include <common/stb_image.h>
+#include <src/common/texture.hpp>
+#include <src/common/stb_image.h>
 
 
 GLuint loadTexture2DGrayFromFilePath(const std::string& path, int *min_value, int *max_value) {

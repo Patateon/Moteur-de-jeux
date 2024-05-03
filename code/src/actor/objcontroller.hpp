@@ -7,9 +7,9 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <common/objloader.hpp>
-#include <common/shader.hpp>
-#include <main/Camera/Camera.hpp>
+#include <src/common/objloader.hpp>
+#include <src/common/shader.hpp>
+#include <src/camera/camera.hpp>
 
 class ObjController
 {

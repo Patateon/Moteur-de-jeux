@@ -2,7 +2,7 @@
 // Include standard headers
 #include <stdlib.h>
 
-#include <main/Actor/ObjController.hpp>
+#include <src/actor/objcontroller.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 class Actor
