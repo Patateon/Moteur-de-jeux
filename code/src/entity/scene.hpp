@@ -1,6 +1,8 @@
 #pragma once
 
 // Standard libs
+#include <reactphysics3d/body/RigidBody.h>
+#include <reactphysics3d/collision/Collider.h>
 #include <reactphysics3d/engine/PhysicsCommon.h>
 #include <vector>
 
@@ -18,6 +20,8 @@ private:
 
     reactphysics3d::PhysicsCommon m_physicsCommon;
     reactphysics3d::PhysicsWorld* m_world;
+    std::vector<reactphysics3d::RigidBody*> bodies;
+    std::vector<reactphysics3d::Collider*> colliders;
 public:
     Scene();
     ~Scene();

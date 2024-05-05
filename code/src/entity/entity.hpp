@@ -32,6 +32,9 @@ private:
 
     // Maillage de l'objet
     Mesh m_currentMesh;
+
+   
+
 public:
     Entity(){}
     Entity(Mesh mesh);

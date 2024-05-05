@@ -1,5 +1,6 @@
 #include "src/entity/entity.hpp"
 #include <iostream>
+#include <reactphysics3d/collision/shapes/SphereShape.h>
 #include <src/entity/scene.hpp>
 #include <src/entity/heightmap.hpp>
 
@@ -14,7 +15,7 @@ Scene::~Scene(){
 void Scene::init(){
 
     m_world = m_physicsCommon.createPhysicsWorld();
-
+    m_world->setGravity(reactphysics3d::Vector3(0.0, -9.81, 0.0));
     // Load every entities
     m_heightMap.loadEntity();
     for(Entity & entity : m_entities){
@@ -89,7 +90,21 @@ void Scene::setupTestScene(){
     sphere.movement().position = glm::vec3(0.0f, 10.f, 5.0f);
     sphere.move();
     m_entities.push_back(sphere);
-
+    /*
+    for (auto& entity : m_entities) {
+        //conversion de transform pour reacphys pour le rigidbody
+        transform::Transform transform=entity.currentTransform();
+        reactphysics3d::Vector3 position(transform.translation.x, transform.translation.y, transform.translation.z);
+        glm::quat rotationQuaternion = glm::quat(glm::radians(transform.eulerAngle));
+        reactphysics3d::Quaternion orientation(rotationQuaternion.x, rotationQuaternion.y, rotationQuaternion.z, rotationQuaternion.w);
+        reactphysics3d::Transform rpTransform(position, orientation);
+        
+        reactphysics3d::RigidBody* rigidBody = m_world->createRigidBody(rpTransform);
+        reactphysics3d::SphereShape* sphereShape=m_physicsCommon.createSphereShape(1.0f);
+        reactphysics3d::Collider* collider = rigidBody->addCollider(sphereShape, rpTransform);
+        bodies.push_back(rigidBody);
+        colliders.push_back(collider);
+    }*/
     // using namespace reactphysics3d;
     // Vector3 spherePosition = Vector3(sphere.movement().position);
     // // Vector3 spherePosition = Vector3(0.0, 40.0, 5.0);
