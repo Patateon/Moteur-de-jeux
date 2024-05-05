@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 
 #include <src/common/mesh.hpp>
+#include <src/camera/camera.hpp>
 
 #define MAX_HEIGHT 30.0f
 
@@ -24,13 +25,14 @@ private:
     Rectangle m_map;
     std::string m_heightMapTexture;
 public:
-    
+    HeightMap();
     HeightMap(Rectangle map);
-    HeightMap(Rectangle map, int hRes, int vRes, std::string path);
+    HeightMap(Rectangle map, int hRes, int vRes, const std::string & filename);
 
     static void generateSurface(
         std::vector<unsigned short> * indices_surface,
         std::vector<glm::vec3> * vertices_surface,
+        std::vector<glm::vec2> * tex_coords,
         Rectangle rectangle,
         int horizontal_res, int vertical_res
     );

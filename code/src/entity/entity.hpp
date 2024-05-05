@@ -4,6 +4,9 @@
 #include "src/actor/objcontroller.hpp"
 #include <vector>
 
+// ReactPhysics3D
+#include <reactphysics3d/reactphysics3d.h>
+
 // Others
 #include <src/common/mesh.hpp>
 #include <src/physics/transform.hpp>
@@ -22,7 +25,7 @@ private:
     Entity* m_parent = nullptr;
 
     // Global and local space informations
-    transform::Transform m_transform;
+    transform::Transform m_currentTransform;
 
     // Mouvement de l'objet (À tester l'impact selon le repère local ou monde ?)
     Movement m_movement;
@@ -32,9 +35,15 @@ private:
 public:
     Entity(){}
     Entity(Mesh mesh);
+    Entity(const std::string & filename);
+    Entity(std::vector<glm::vec3> vertices, std::vector<unsigned short> indices);
 
     Mesh & currentMesh() { return m_currentMesh; }
     const Mesh & currentMesh() const { return m_currentMesh; }
+
+    Movement & movement() { return m_movement; }
+
+    transform::Transform & currentTransform() { return m_currentTransform; }
 
     // Actualiser le mouvement, (Modifie la matrice model en conséquence)
     void move();

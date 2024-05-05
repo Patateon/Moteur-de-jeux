@@ -80,10 +80,12 @@ add_executable(main
     src/common/vboindexer.hpp
 
     # Entity Components
-    src/entity/entity.hpp
     src/entity/entity.cpp
+    src/entity/entity.hpp
     src/entity/heightmap.cpp
     src/entity/heightmap.hpp
+    src/entity/scene.cpp
+    src/entity/scene.hpp
 
     # Physic engine
     src/physics/physicworld.cpp
@@ -91,6 +93,7 @@ add_executable(main
     src/physics/transform.cpp
     src/physics/transform.hpp
 
+    # Actor components (not used)
     src/actor/actor.cpp
     src/actor/actor.hpp
     src/actor/objcontroller.cpp

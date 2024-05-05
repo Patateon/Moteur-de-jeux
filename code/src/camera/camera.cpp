@@ -9,9 +9,6 @@
 
 using namespace glm;
 
-// Log/Debug
-#include <iostream>
-
 void Camera::init()
 {
     m_fovDegree = 45.0f;
@@ -33,6 +30,8 @@ void Camera::updateInterface(float _deltaTime)
         ImGui::Separator();
         ImGui::Text("Welcome to this TP about Cameras! Press escape to close the exe");
         ImGui::Text("Long live to the cameras");
+        ImGui::Separator();
+        ImGui::Text("FPS: %f", 1.f /_deltaTime);
         ImGui::Separator();
         if(ImGui::CollapsingHeader("Camera settings")){
             updateCameraSettingsInterface(_deltaTime);

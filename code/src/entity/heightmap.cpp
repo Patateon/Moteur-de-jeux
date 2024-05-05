@@ -6,14 +6,15 @@
 using namespace std;
 using namespace glm;
 
+HeightMap::HeightMap(){}
 
 HeightMap::HeightMap(Rectangle map){
     m_map = map;
 }
 
-HeightMap::HeightMap(Rectangle map, int hRes, int vRes, std::string path){
+HeightMap::HeightMap(Rectangle map, int hRes, int vRes, const std::string & filename){
     m_map = map;
-    m_heightMapTexture = path;
+    m_heightMapTexture = filename;
 
     build(hRes, vRes);
 }
@@ -21,10 +22,11 @@ HeightMap::HeightMap(Rectangle map, int hRes, int vRes, std::string path){
 void HeightMap::build(int hRes, int vRes){
     vector<unsigned short> triangles;
     vector<vec3> vertices;
+    vector<vec2> texCoords;
 
-    generateSurface(&triangles, &vertices, m_map, hRes, vRes);
+    generateSurface(&triangles, &vertices, &texCoords, m_map, hRes, vRes);
     currentMesh() = Mesh(vertices, triangles);
-    currentMesh().recomputeTextureCoordinates();
+    currentMesh().vertexTexCoords() = texCoords;
     applyHeightMap();
     currentMesh().recomputeNormals();
 }
@@ -61,6 +63,7 @@ void HeightMap::applyHeightMap() {
 void HeightMap::generateSurface(
     vector<unsigned short> * indices_surface,
     vector<vec3> * vertices_surface,
+    vector<vec2> * tex_coords,
     Rectangle rectangle,
     int horizontal_res, int vertical_res){
     unsigned short v0, v1, v2, v3;
@@ -73,7 +76,9 @@ void HeightMap::generateSurface(
             float horizontal_step = (float) j / (float) (horizontal_res-1);
             float vertical_step = (float) i / (float) (vertical_res-1);
             vec3 new_points = rectangle.bottomLeft + (rectangle.right*horizontal_step) + (rectangle.up*vertical_step);
+            vec2 new_texCoords = vec2(1.0f - ((float) i / (float) (vertical_res-1)), (float) j / (float) (horizontal_res-1));
             vertices_surface->push_back(new_points);
+            tex_coords->push_back(new_texCoords);
         }
     }
 

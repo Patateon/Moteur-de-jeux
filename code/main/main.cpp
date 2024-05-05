@@ -1,4 +1,11 @@
 // Include standard headers
+#include "src/entity/scene.hpp"
+#include <reactphysics3d/body/RigidBody.h>
+#include <reactphysics3d/engine/PhysicsCommon.h>
+#include <reactphysics3d/engine/PhysicsWorld.h>
+#include <reactphysics3d/mathematics/Quaternion.h>
+#include <reactphysics3d/mathematics/Transform.h>
+#include <reactphysics3d/mathematics/Vector3.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,8 +31,6 @@ GLFWwindow* window;
 #include <src/actor/actor.hpp>
 #include <src/actor/objcontroller.hpp>
 #include <src/camera/camera.hpp>
-
-using namespace glm;
 
 #include <src/entity/heightmap.hpp>
 #include <src/common/objloader.hpp>
@@ -75,34 +80,12 @@ int main(void)
 
     /****************************************/  
 
-
-    //Chargement du fichier de maillage
-    // ObjController map;
-    // Actor target;
-
-    Rectangle rec;
-    rec.bottomLeft = glm::vec3(-75.0f, 0.0, -75.0f);
-    rec.right = glm::vec3(150.0f, 0.0f, 0.0f);
-    rec.up = glm::vec3(0.0f, 0.0f, 150.0f);
-    std::string hMapTex = std::string("../assets/map/heightmap-1024x1024.png");
-    HeightMap hMap = HeightMap(rec, 30, 30, hMapTex);
-    hMap.build(30, 30);
-    hMap.currentMesh().hasTexture(false);
-    hMap.currentMesh().color(glm::vec3(0.5f, 0.0f, 0.0f));
-    
-    hMap.currentMesh().toggleTexture();
-    hMap.currentMesh().texture("../assets/map/grass.png");
-    hMap.loadEntity();
-
-    PhysicWorld pworld;
-    pworld.test();
-
-
-    // glBindVertexArray(VertexArrayID);
-    // map.loadObj("../assets/myMap2.obj", glm::vec3(0.6f, 0.5f, 0.3f), colorID);
-    // target.load("../assets/cameraTarget.obj", glm::vec3(0.8f, 0.5f, 0.4f), colorID);
-
     glUseProgram(programID);
+
+    // Init Scene
+    Scene currentScene;
+    currentScene.setupTestScene();
+    currentScene.init();
 
     // Init ImGUI
     initImgui();
@@ -127,8 +110,6 @@ int main(void)
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // input
-
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -143,6 +124,7 @@ int main(void)
         // Update
         // target.update(deltaTime, window, myCamera.getRotation());
         myCamera.update(deltaTime, window);
+        currentScene.update(deltaTime, myCamera, MatrixID, ModelMatrixID, colorID, hasTextureID);
 
 
         glm::mat4 viewMatrix = myCamera.getViewMatrix();
@@ -150,12 +132,6 @@ int main(void)
 
         //View
         updateLightPosition(LightID);
-
-        // map.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID);
-        glUniform3f(colorID, hMap.currentMesh().color()[0], hMap.currentMesh().color()[1], hMap.currentMesh().color()[2]);
-        hMap.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID, colorID, hasTextureID);
-        glBindVertexArray(VertexArrayID);
-        // target.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID); 
 
         // Renders the ImGUI elements
         ImGui::Render();
@@ -179,14 +155,14 @@ int main(void)
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
-    // Cleanup VBO and shader
+    // Clear scene
+    currentScene.clear();
 
+    // Cleanup VBO and shader
     glDeleteProgram(programID);
-    //glDeleteTextures(1, &Texture);
+    glDeleteTextures(1, &textureID);
     glDeleteVertexArrays(1, &VertexArrayID);
-    // map.deleteBuffer();
-    hMap.clear();
-    // target.destroy();
+
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
 
@@ -262,7 +238,7 @@ void windowSetup()
     //glfwSetCursorPos(window, 1024 / 2, 768 / 2);
 
     // Dark blue background
-    glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
+    glClearColor(0.45f, 0.45f, 0.45f, 0.0f);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
