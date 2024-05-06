@@ -38,5 +38,5 @@ namespace transform {
 
         // Compute the model matrix in the local space
         glm::mat4 getLocalModel();
-};
+    };
 }

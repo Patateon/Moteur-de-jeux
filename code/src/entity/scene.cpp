@@ -1,10 +1,18 @@
-#include "src/entity/entity.hpp"
-#include <iostream>
+#include <reactphysics3d/body/RigidBody.h>
+#include <reactphysics3d/collision/Collider.h>
+#include <reactphysics3d/collision/CollisionCallback.h>
+#include <reactphysics3d/collision/HeightField.h>
+#include <reactphysics3d/collision/shapes/HeightFieldShape.h>
 #include <reactphysics3d/collision/shapes/SphereShape.h>
+#include <reactphysics3d/components/RigidBodyComponents.h>
+#include <reactphysics3d/engine/Entity.h>
+#include <reactphysics3d/utils/Message.h>
 #include <src/entity/scene.hpp>
+#include <src/entity/entity.hpp>
 #include <src/entity/heightmap.hpp>
 
 #include <string>
+#include <vector>
 
 Scene::Scene(){}
 
@@ -16,10 +24,11 @@ void Scene::init(){
 
     m_world = m_physicsCommon.createPhysicsWorld();
     m_world->setGravity(reactphysics3d::Vector3(0.0, -9.81, 0.0));
+    
     // Load every entities
-    m_heightMap.loadEntity();
+    m_heightMap.loadEntity(m_world);
     for(Entity & entity : m_entities){
-        entity.loadEntity();
+        entity.loadEntity(m_world);
     }
 }
 
@@ -33,12 +42,12 @@ void Scene::update(float _deltatime, const Camera& _camera, GLuint _matrixID, GL
     sphere.move();
     std::cout<<spherePosition.x<<", "<<spherePosition.y<<", "<<spherePosition.z<<std::endl; */
     
-    
+    m_world->update(_deltatime);
 
     // Render
-    m_heightMap.updateViewAndDraw(_camera, _matrixID, _modelMatrixID, _colorID, _hasTextureID);
+    m_heightMap.updateViewAndDraw(_camera, m_world, _matrixID, _modelMatrixID, _colorID, _hasTextureID);
     for(Entity & entity : m_entities){
-        entity.updateViewAndDraw(_camera, _matrixID, _modelMatrixID, _colorID, _hasTextureID);
+        entity.updateViewAndDraw(_camera, m_world, _matrixID, _modelMatrixID, _colorID, _hasTextureID);
     }
 
 }
@@ -49,22 +58,22 @@ void Scene::clear(){
         entity.clear();
     }
 
-    // m_physicsCommon.destroyPhysicsWorld(m_world);
+    m_physicsCommon.destroyPhysicsWorld(m_world);
 }
 
 void Scene::setupTestScene(){
+
+    //// Setup for entities of the scene
 
     // Height Map
     Rectangle rec;
     rec.bottomLeft = glm::vec3(-75.0f, 0.0, -75.0f);
     rec.right = glm::vec3(150.0f, 0.0f, 0.0f);
     rec.up = glm::vec3(0.0f, 0.0f, 150.0f);
-    m_heightMap = HeightMap(rec, 30, 30, "../assets/map/heightmap-1024x1024.png");
+    m_heightMap = HeightMap(rec, 30, 30, "../assets/map/default-heightmap-1024x1024.png");
     m_heightMap.build(30, 30);
     m_heightMap.currentMesh().hasTexture(false);
     m_heightMap.currentMesh().color(glm::vec3(0.91f, 0.91f, 0.91f));
-    // m_heightMap.currentMesh().texture("../assets/map/grass.png");
-
 
     // Simple sphere entity
     Entity sphere = Entity("../assets/entities/sphere.off");
@@ -90,6 +99,65 @@ void Scene::setupTestScene(){
     sphere.movement().position = glm::vec3(0.0f, 10.f, 5.0f);
     sphere.move();
     m_entities.push_back(sphere);
+
+    //// Init each entities and give the possibilities to give options for physics
+    init();
+
+    //// Physicals bodies settings
+    using namespace reactphysics3d;
+
+    // Height map not affected by physics
+    m_heightMap.physicalEntity()->setType(BodyType::STATIC);
+
+    float heightValue[30 * 30];
+    
+    for(uint i = 0; i < m_heightMap.currentMesh().vertexPosition().size(); i++){
+        heightValue[i] = m_heightMap.currentMesh().vertexPosition()[i].y;
+    }
+
+    std::vector<reactphysics3d::Message> logHeightMap;
+    HeightField* heightField = m_physicsCommon.createHeightField(
+        30, 30, heightValue,
+        reactphysics3d::HeightField::HeightDataType::HEIGHT_FLOAT_TYPE,
+        logHeightMap);
+
+    // Display the messages (info, warning and errors)
+    if (logHeightMap.size() > 0) {
+    
+        for (const rp3d::Message& message: logHeightMap) {
+    
+            std::string messageType;
+    
+            switch(message.type) {
+                case rp3d::Message::Type::Information:
+                    messageType = "info";
+                    break;
+                case rp3d::Message::Type::Warning:
+                    messageType = "warning";
+                    break;
+                case rp3d::Message::Type::Error:
+                    messageType = "error";
+                    break;
+            }
+    
+            std::cout << "Message (" << messageType << "): " << message.text << std::endl;
+        }
+    }
+    
+    // Make sure there was no errors during the height field creation
+    assert(heightField != nullptr);
+
+    HeightFieldShape* heightMapShape = m_physicsCommon.createHeightFieldShape(heightField);
+
+    Collider* heightMapCollider = m_heightMap.physicalEntity()->addCollider(heightMapShape, Transform::identity());
+
+    // Describes colliders of each entities
+    for (auto& entity : m_entities) {
+        float radius = 0.5f;
+        SphereShape* sphereShape = m_physicsCommon.createSphereShape(radius);
+        Collider* entityCollider = entity.physicalEntity()->addCollider(sphereShape, Transform::identity());
+    }
+
     /*
     for (auto& entity : m_entities) {
         //conversion de transform pour reacphys pour le rigidbody

@@ -85,7 +85,6 @@ int main(void)
     // Init Scene
     Scene currentScene;
     currentScene.setupTestScene();
-    currentScene.init();
 
     // Init ImGUI
     initImgui();
@@ -154,9 +153,6 @@ int main(void)
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-
-    // Clear scene
-    currentScene.clear();
 
     // Cleanup VBO and shader
     glDeleteProgram(programID);

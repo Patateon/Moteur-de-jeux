@@ -20,8 +20,8 @@ private:
 
     reactphysics3d::PhysicsCommon m_physicsCommon;
     reactphysics3d::PhysicsWorld* m_world;
-    std::vector<reactphysics3d::RigidBody*> bodies;
-    std::vector<reactphysics3d::Collider*> colliders;
+    std::vector<reactphysics3d::RigidBody*> m_bodies;
+    std::vector<reactphysics3d::Collider*> m_colliders;
 public:
     Scene();
     ~Scene();

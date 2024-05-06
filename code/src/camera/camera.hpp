@@ -10,7 +10,7 @@
 
 #define MAX_PITCH 89.0f
 
-static float epsilon_camera = 0.1f;
+const static float epsilon_camera = 0.1f;
 
 //// Fonction statique pour la gestion des contrôles de la caméra
 

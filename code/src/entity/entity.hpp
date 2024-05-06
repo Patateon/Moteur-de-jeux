@@ -2,6 +2,9 @@
 
 // Standard lib
 #include "src/actor/objcontroller.hpp"
+#include <reactphysics3d/body/RigidBody.h>
+#include <reactphysics3d/engine/Entity.h>
+#include <reactphysics3d/engine/PhysicsWorld.h>
 #include <vector>
 
 // ReactPhysics3D
@@ -33,7 +36,7 @@ private:
     // Maillage de l'objet
     Mesh m_currentMesh;
 
-   
+    reactphysics3d::RigidBody* m_physicalEntity;
 
 public:
     Entity(){}
@@ -48,6 +51,8 @@ public:
 
     transform::Transform & currentTransform() { return m_currentTransform; }
 
+    reactphysics3d::RigidBody* physicalEntity() { return m_physicalEntity; } 
+
     // Actualiser le mouvement, (Modifie la matrice model en conséquence)
     void move();
 
@@ -57,8 +62,14 @@ public:
     // Met à jour les matrices models global de chaque enfant de l'entité
     void updateSelfAndChild();
 
+    // Physics init and update function
+    void initBody(reactphysics3d::PhysicsWorld* _world);
+
     // Rendering function overload
-    void loadEntity();
-    void updateViewAndDraw(const Camera& _camera, GLuint _matrixID, GLuint _modelMatrixID, GLuint _colorID, GLuint _hasTextureID);
+    void loadEntity(reactphysics3d::PhysicsWorld* _world);
+    void updateViewAndDraw(const Camera& _camera, 
+        reactphysics3d::PhysicsWorld* _world,
+        GLuint _matrixID, GLuint _modelMatrixID, 
+        GLuint _colorID, GLuint _hasTextureID);
     void clear();
 };
