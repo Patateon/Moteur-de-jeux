@@ -17,7 +17,7 @@ void Camera::init()
     m_eulerAngle = vec3(0.f, 0.f, 0.f);
     m_rotation = quat{};
     m_defaultMovementMode = true;
-    m_translationSpeed = 10.0f;
+    m_translationSpeed = 30.0f;
     m_rotationSpeed = 0.15f;
 }
 
@@ -63,7 +63,7 @@ void Camera::updateCameraSettingsInterface(float _deltaTime)
     ImGui::Separator();
 
     ImGui::Text("Translation Speed (%f)", m_translationSpeed);
-    ImGui::SliderFloat("Translation speed", &m_translationSpeed, 0.f, 10.f);
+    ImGui::SliderFloat("Translation speed", &m_translationSpeed, 0.f, 200.f);
     ImGui::Separator();
 
     ImGui::Text("Rotation Speed (%f)", m_rotationSpeed);

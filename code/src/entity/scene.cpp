@@ -1,11 +1,17 @@
+#include <iostream>
 #include <reactphysics3d/body/RigidBody.h>
 #include <reactphysics3d/collision/Collider.h>
 #include <reactphysics3d/collision/CollisionCallback.h>
 #include <reactphysics3d/collision/HeightField.h>
+#include <reactphysics3d/collision/shapes/AABB.h>
 #include <reactphysics3d/collision/shapes/HeightFieldShape.h>
 #include <reactphysics3d/collision/shapes/SphereShape.h>
 #include <reactphysics3d/components/RigidBodyComponents.h>
 #include <reactphysics3d/engine/Entity.h>
+#include <reactphysics3d/mathematics/Quaternion.h>
+#include <reactphysics3d/mathematics/Transform.h>
+#include <reactphysics3d/mathematics/Vector3.h>
+#include <reactphysics3d/utils/DebugRenderer.h>
 #include <reactphysics3d/utils/Message.h>
 #include <src/entity/scene.hpp>
 #include <src/entity/entity.hpp>
@@ -70,10 +76,10 @@ void Scene::setupTestScene(){
     rec.bottomLeft = glm::vec3(-75.0f, 0.0, -75.0f);
     rec.right = glm::vec3(150.0f, 0.0f, 0.0f);
     rec.up = glm::vec3(0.0f, 0.0f, 150.0f);
-    m_heightMap = HeightMap(rec, 30, 30, "../assets/map/default-heightmap-1024x1024.png");
+    m_heightMap = HeightMap(rec, 30, 30, "../assets/map/heightmap-1024x1024.png");
     m_heightMap.build(30, 30);
     m_heightMap.currentMesh().hasTexture(false);
-    m_heightMap.currentMesh().color(glm::vec3(0.91f, 0.91f, 0.91f));
+    m_heightMap.currentMesh().color(glm::vec3(0.30f, 0.30f, 0.30f));
 
     // Simple sphere entity
     Entity sphere = Entity("../assets/entities/sphere.off");
@@ -110,9 +116,15 @@ void Scene::setupTestScene(){
     m_heightMap.physicalEntity()->setType(BodyType::STATIC);
 
     float heightValue[30 * 30];
+
+    float minHeight = FLT_MAX;
+    float maxHeight = FLT_MIN;
+
     
     for(uint i = 0; i < m_heightMap.currentMesh().vertexPosition().size(); i++){
         heightValue[i] = m_heightMap.currentMesh().vertexPosition()[i].y;
+        minHeight = minHeight < heightValue[i] ? minHeight : heightValue[i]; 
+        maxHeight = maxHeight > heightValue[i] ? maxHeight : heightValue[i]; 
     }
 
     std::vector<reactphysics3d::Message> logHeightMap;
@@ -147,9 +159,14 @@ void Scene::setupTestScene(){
     // Make sure there was no errors during the height field creation
     assert(heightField != nullptr);
 
-    HeightFieldShape* heightMapShape = m_physicsCommon.createHeightFieldShape(heightField);
-
-    Collider* heightMapCollider = m_heightMap.physicalEntity()->addCollider(heightMapShape, Transform::identity());
+    HeightFieldShape* heightMapShape = m_physicsCommon.createHeightFieldShape(heightField, Vector3(1.0f, 1.f, 1.0f));
+    AABB heightMapBound = heightMapShape->getLocalBounds();
+    float heightMapScaleX = ((m_heightMap.map().right.x) / 2.0f) / heightMapBound.getMax().x;
+    float heightMapScaleZ = ((m_heightMap.map().up.z) / 2.0f) / heightMapBound.getMax().z;
+    Vector3 heightMapScale = Vector3(heightMapScaleX, 1.0f, heightMapScaleZ);
+    heightMapShape->setScale(heightMapScale);
+    Transform heightMapTransform = Transform(Vector3(0.0f, heightMapBound.getMax().y, 0.0f), Quaternion::identity());
+    Collider* heightMapCollider = m_heightMap.physicalEntity()->addCollider(heightMapShape, heightMapTransform);
 
     // Describes colliders of each entities
     for (auto& entity : m_entities) {
@@ -157,6 +174,8 @@ void Scene::setupTestScene(){
         SphereShape* sphereShape = m_physicsCommon.createSphereShape(radius);
         Collider* entityCollider = entity.physicalEntity()->addCollider(sphereShape, Transform::identity());
     }
+
+    m_entities[0].physicalEntity()->applyLocalForceAtCenterOfMass(Vector3(0.0, 0.0, 150.0));
 
     /*
     for (auto& entity : m_entities) {

@@ -18,12 +18,19 @@ struct Rectangle{
     glm::vec3 right;
 };
 
+struct Resolution{
+    int h;
+    int v;
+};
+
 class HeightMap : public Entity
 {
 private:
     float m_maxHeight = 10.f;
     Rectangle m_map;
     std::string m_heightMapTexture;
+    Resolution m_res;
+
 public:
     HeightMap();
     HeightMap(Rectangle map);
@@ -41,12 +48,15 @@ public:
     
     void applyHeightMap();
 
+    reactphysics3d::Collider* createCollider(reactphysics3d::PhysicsCommon* _physicsCommon);
+
     float maxHeight() const { return m_maxHeight; }
     void maxHeight(float maxH) { m_maxHeight = maxH; }
-    
  
     Rectangle map() const { return m_map; }
     void map(Rectangle map) { m_map = map; }
+
+    Resolution res() const { return m_res; }
 
     std::string heightMapTexture() const { return m_heightMapTexture; }
     void heightMapTexture(const std::string path) { m_heightMapTexture = path;}
