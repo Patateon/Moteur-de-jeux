@@ -76,6 +76,7 @@ void Scene::setupTestScene(){
     rec.right = glm::vec3(150.0f, 0.0f, 0.0f);
     rec.up = glm::vec3(0.0f, 0.0f, 150.0f);
     m_heightMap = HeightMap(rec, 30, 30, "../assets/map/heightmap-1024x1024.png");
+    m_heightMap.maxHeight(10.f);
     m_heightMap.build(30, 30);
     m_heightMap.currentMesh().hasTexture(false);
     m_heightMap.currentMesh().color(glm::vec3(0.30f, 0.30f, 0.30f));

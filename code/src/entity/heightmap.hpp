@@ -10,8 +10,6 @@
 #include <src/common/mesh.hpp>
 #include <src/camera/camera.hpp>
 
-#define MAX_HEIGHT 30.0f
-
 struct Rectangle{
     glm::vec3 bottomLeft;
     glm::vec3 up;
