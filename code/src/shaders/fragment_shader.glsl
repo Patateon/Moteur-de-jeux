@@ -2,27 +2,40 @@
 
 // Interpolated values from the vertex shaders
 in vec2 UV;
-in vec3 Position_worldspace;
-in vec3 Normal_cameraspace;
-in vec3 EyeDirection_cameraspace;
-in vec3 LightDirection_cameraspace;
+in vec3 position_worldspace;
+in vec3 normal_worldspace;
 
 // Ouput data
-out vec3 color;
+out vec4 fragmentColor;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2D texture_Mesh;
-uniform mat4 MV;
-uniform vec3 LightPosition_worldspace;
+uniform vec3 lightPosition_worldspace;
+uniform vec3 lightColor;
+uniform vec3 cameraPosition;
 uniform vec3 color_Mesh;
 uniform int hasTexture;
 
 void main(){
 
-	// Light emission properties
-	// You probably want to put them as uniforms
-	vec3 LightColor = vec3(1,1,1);
-	float LightPower = 100.0f;
+	// vec3 lightColor = vec3(1.0, 1.0, 1.0);
+	// Ambient
+    float ambient_str = 0.7;
+    vec3 ambient = ambient_str * lightColor;
+
+    // Diffuse
+    float diffuse_str = 0.5;
+    vec3 normal = normalize(normal_worldspace);
+    vec3 light_dir = normalize(lightPosition_worldspace - position_worldspace);
+    float diffuse_k = max(dot(normal, light_dir), 0.0);
+    vec3 diffuse = diffuse_str * diffuse_k * lightColor;
+
+    // Specular
+    float specular_str = 1.0;
+    vec3 view_dir = normalize(cameraPosition - position_worldspace);
+    vec3 reflect_dir = reflect(-light_dir, normal);
+    float specular_k = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
+    vec3 specular = specular_str * specular_k * lightColor;
 	
 	// Material properties
 	vec3 MaterialColor;
@@ -32,13 +45,7 @@ void main(){
 		MaterialColor = color_Mesh;
 	}
 
-	// Distance to the light
-	float distance = length( LightPosition_worldspace - Position_worldspace );
+    vec3 final_color = ((ambient + diffuse) * MaterialColor) /* + specular */;
 
-	vec3 n = normalize( Normal_cameraspace );
-	vec3 l = normalize( LightDirection_cameraspace );
-	float cosTheta = dot( n,l );
-	cosTheta = max(cosTheta, 0.3);
-	
-	color = MaterialColor* cosTheta;
+    fragmentColor = vec4(final_color.xyz, 1.0);
 }

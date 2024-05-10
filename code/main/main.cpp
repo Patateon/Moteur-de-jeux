@@ -56,7 +56,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 GLFWwindow* initWindow();
 void windowSetup();
 void initImgui();
-void updateLightPosition(GLuint _lightID);
+void updateLightPosition(GLuint _lightID, GLuint _lightColorID);
 
 int main(void)
 {
@@ -73,7 +73,9 @@ int main(void)
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
     GLuint ViewMatrixID = glGetUniformLocation(programID, "V");
     GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
-    GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
+    GLuint LightID = glGetUniformLocation(programID, "lightPosition_worldspace");
+    GLuint LightColorID = glGetUniformLocation(programID, "lightColor");
+    GLuint CameraPositionID = glGetUniformLocation(programID, "cameraPosition");
     GLuint hasTextureID = glGetUniformLocation(programID, "hasTexture");
     GLuint colorID = glGetUniformLocation(programID, "color_Mesh");
     GLuint textureID = glGetUniformLocation(programID, "texture_Mesh");
@@ -125,12 +127,14 @@ int main(void)
         myCamera.update(deltaTime, window);
         currentScene.update(deltaTime, myCamera, MatrixID, ModelMatrixID, colorID, hasTextureID);
 
+        glm::vec3 cameraPosition = myCamera.getPosition();
+        glUniform3f(CameraPositionID, cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
         glm::mat4 viewMatrix = myCamera.getViewMatrix();
         glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &viewMatrix[0][0]);
 
         //View
-        updateLightPosition(LightID);
+        updateLightPosition(LightID, LightColorID);
 
         // Renders the ImGUI elements
         ImGui::Render();
@@ -255,8 +259,10 @@ void initImgui()
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-void updateLightPosition(GLuint _lightID)
+void updateLightPosition(GLuint _lightID, GLuint _lightColorID)
 {
-    const glm::vec3 lightPos = glm::vec3(4.f, 90.f, 4.f);
+    const glm::vec3 lightPos = glm::vec3(4.f, 400.f, 4.f);
+    const glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
     glUniform3f(_lightID, lightPos.x, lightPos.y, lightPos.z);
+    glUniform3f(_lightColorID, lightColor.x, lightColor.y, lightColor.z);
 }
