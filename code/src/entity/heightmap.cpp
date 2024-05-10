@@ -66,7 +66,6 @@ reactphysics3d::Collider* HeightMap::createCollider(reactphysics3d::PhysicsCommo
     using namespace reactphysics3d;
 
     float heightValue[m_res.h * m_res.v];
-    std::cout<<m_res.h * m_res.v<<std::endl;
 
     float minHeight = FLT_MAX;
     float maxHeight = FLT_MIN;
