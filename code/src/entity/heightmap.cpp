@@ -114,15 +114,18 @@ reactphysics3d::Collider* HeightMap::createCollider(reactphysics3d::PhysicsCommo
     assert(heightField != nullptr);
 
     HeightFieldShape* heightMapShape = _physicsCommon->createHeightFieldShape(heightField, Vector3(1.0f, 1.f, 1.0f));
+
+    // Détermine le bon facteur d'échelle par rapport aux dimensions de la heightMap
     AABB heightMapBound = heightMapShape->getLocalBounds();
-    float heightMapScaleX = ((this->map().right.length()) / 2.0f) / heightMapBound.getMax().x;
-    float heightMapScaleZ = ((this->map().up.length()) / 2.0f) / heightMapBound.getMax().z;
+    float heightMapScaleX = (length(this->map().right) / 2.0f) / heightMapBound.getMax().x;
+    float heightMapScaleZ = (length(this->map().up) / 2.0f) / heightMapBound.getMax().z;
     Vector3 heightMapScale = Vector3(heightMapScaleX, 1.0f, heightMapScaleZ);
     heightMapShape->setScale(heightMapScale);
+
+    // Décale la collision de la heightMap pour la recentrer (rp3d recentre automatiquement la height map il faut donc corriger cela)
     Transform heightMapTransform = Transform(Vector3(0.0f, heightMapBound.getMax().y, 0.0f), Quaternion::identity());
 
-    Collider* collider = this->physicalEntity()->addCollider(heightMapShape, heightMapTransform);
-    return collider;
+    return this->physicalEntity()->addCollider(heightMapShape, heightMapTransform);
 }
 
 // À partir d'un rectangle et d'une résolution, 

@@ -1,4 +1,3 @@
-#include <iostream>
 #include <reactphysics3d/body/RigidBody.h>
 #include <reactphysics3d/collision/Collider.h>
 #include <reactphysics3d/collision/CollisionCallback.h>
@@ -115,58 +114,7 @@ void Scene::setupTestScene(){
     // Height map not affected by physics
     m_heightMap.physicalEntity()->setType(BodyType::STATIC);
 
-    float heightValue[30 * 30];
-
-    float minHeight = FLT_MAX;
-    float maxHeight = FLT_MIN;
-
-    
-    for(uint i = 0; i < m_heightMap.currentMesh().vertexPosition().size(); i++){
-        heightValue[i] = m_heightMap.currentMesh().vertexPosition()[i].y;
-        minHeight = minHeight < heightValue[i] ? minHeight : heightValue[i]; 
-        maxHeight = maxHeight > heightValue[i] ? maxHeight : heightValue[i]; 
-    }
-
-    std::vector<reactphysics3d::Message> logHeightMap;
-    HeightField* heightField = m_physicsCommon.createHeightField(
-        30, 30, heightValue,
-        reactphysics3d::HeightField::HeightDataType::HEIGHT_FLOAT_TYPE,
-        logHeightMap);
-
-    // Display the messages (info, warning and errors)
-    if (logHeightMap.size() > 0) {
-    
-        for (const rp3d::Message& message: logHeightMap) {
-    
-            std::string messageType;
-    
-            switch(message.type) {
-                case rp3d::Message::Type::Information:
-                    messageType = "info";
-                    break;
-                case rp3d::Message::Type::Warning:
-                    messageType = "warning";
-                    break;
-                case rp3d::Message::Type::Error:
-                    messageType = "error";
-                    break;
-            }
-    
-            std::cout << "Message (" << messageType << "): " << message.text << std::endl;
-        }
-    }
-    
-    // Make sure there was no errors during the height field creation
-    assert(heightField != nullptr);
-
-    HeightFieldShape* heightMapShape = m_physicsCommon.createHeightFieldShape(heightField, Vector3(1.0f, 1.f, 1.0f));
-    AABB heightMapBound = heightMapShape->getLocalBounds();
-    float heightMapScaleX = ((m_heightMap.map().right.x) / 2.0f) / heightMapBound.getMax().x;
-    float heightMapScaleZ = ((m_heightMap.map().up.z) / 2.0f) / heightMapBound.getMax().z;
-    Vector3 heightMapScale = Vector3(heightMapScaleX, 1.0f, heightMapScaleZ);
-    heightMapShape->setScale(heightMapScale);
-    Transform heightMapTransform = Transform(Vector3(0.0f, heightMapBound.getMax().y, 0.0f), Quaternion::identity());
-    Collider* heightMapCollider = m_heightMap.physicalEntity()->addCollider(heightMapShape, heightMapTransform);
+    Collider* heightMapCollider = m_heightMap.createCollider(&m_physicsCommon);
 
     // Describes colliders of each entities
     for (auto& entity : m_entities) {
@@ -175,27 +123,6 @@ void Scene::setupTestScene(){
         Collider* entityCollider = entity.physicalEntity()->addCollider(sphereShape, Transform::identity());
     }
 
+    //// Initial forces settings
     m_entities[0].physicalEntity()->applyLocalForceAtCenterOfMass(Vector3(0.0, 0.0, 150.0));
-
-    /*
-    for (auto& entity : m_entities) {
-        //conversion de transform pour reacphys pour le rigidbody
-        transform::Transform transform=entity.currentTransform();
-        reactphysics3d::Vector3 position(transform.translation.x, transform.translation.y, transform.translation.z);
-        glm::quat rotationQuaternion = glm::quat(glm::radians(transform.eulerAngle));
-        reactphysics3d::Quaternion orientation(rotationQuaternion.x, rotationQuaternion.y, rotationQuaternion.z, rotationQuaternion.w);
-        reactphysics3d::Transform rpTransform(position, orientation);
-        
-        reactphysics3d::RigidBody* rigidBody = m_world->createRigidBody(rpTransform);
-        reactphysics3d::SphereShape* sphereShape=m_physicsCommon.createSphereShape(1.0f);
-        reactphysics3d::Collider* collider = rigidBody->addCollider(sphereShape, rpTransform);
-        bodies.push_back(rigidBody);
-        colliders.push_back(collider);
-    }*/
-    // using namespace reactphysics3d;
-    // Vector3 spherePosition = Vector3(sphere.movement().position);
-    // // Vector3 spherePosition = Vector3(0.0, 40.0, 5.0);
-    // Quaternion sphereOrientation = Quaternion::identity();
-    // Transform sphereTransform(spherePosition, sphereOrientation);
-    // RigidBody* sphereBody = m_world->createRigidBody(sphereTransform);
 }
