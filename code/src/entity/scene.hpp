@@ -18,7 +18,7 @@ class Scene
 private:
     HeightMap m_heightMap;
     std::vector<Entity> m_entities;
-    std::vector<DestructibleEntity*> m_destructibles;
+    std::vector<DestructibleEntity> m_destructibles;
 
     reactphysics3d::PhysicsCommon m_physicsCommon;
     reactphysics3d::PhysicsWorld* m_world;

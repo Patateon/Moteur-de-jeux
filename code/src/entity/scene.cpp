@@ -39,8 +39,8 @@ void Scene::init(){
         entity.loadEntity(m_world);
     }
 
-    for(DestructibleEntity * dstEntity : m_destructibles){
-        dstEntity->loadEntity(m_world);
+    for(DestructibleEntity & dstEntity : m_destructibles){
+        dstEntity.loadEntity(m_world);
     }
 }
 
@@ -55,9 +55,9 @@ void Scene::update(float _deltatime, const Camera& _camera, GLuint _matrixID, GL
         entity.updateViewAndDraw(_camera, m_world, _matrixID, _modelMatrixID, _colorID, _hasTextureID);
     }
 
-    // for(DestructibleEntity * dstEntity : m_destructibles){
-    //     dstEntity->updateViewAndDraw(_camera, m_world, _matrixID, _modelMatrixID, _colorID, _hasTextureID);
-    // }
+     for(DestructibleEntity & dstEntity : m_destructibles){
+         dstEntity.updateViewAndDraw(_camera, m_world, _matrixID, _modelMatrixID, _colorID, _hasTextureID);
+     }
 
 }
 
@@ -123,7 +123,7 @@ void Scene::setupTestScene(){
     test.move();
     test.currentMesh().color(glm::vec3(1.0f, 0.0f, 0.0f));
     test.currentMesh().hasTexture(false);
-    m_destructibles.push_back(&test);
+    m_destructibles.push_back(test);
 
     //// Init each entities and give the possibilities to give options for physics
     init();
