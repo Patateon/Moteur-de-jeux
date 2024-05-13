@@ -1,3 +1,6 @@
+#include <src/entity/destructibleEntity.hpp>
+#include <src/entity/fractureGenerator.hpp>
+
 #include <reactphysics3d/body/RigidBody.h>
 #include <reactphysics3d/collision/Collider.h>
 #include <reactphysics3d/collision/CollisionCallback.h>
@@ -35,17 +38,14 @@ void Scene::init(){
     for(Entity & entity : m_entities){
         entity.loadEntity(m_world);
     }
+
+    for(DestructibleEntity * dstEntity : m_destructibles){
+        dstEntity->loadEntity(m_world);
+    }
 }
 
 void Scene::update(float _deltatime, const Camera& _camera, GLuint _matrixID, GLuint _modelMatrixID, GLuint _colorID, GLuint _hasTextureID){
     // Update physics
-    /* using namespace reactphysics3d;
-    m_world->update(_deltatime);
-    const Transform& sphereTransform = sphereBody->getTransform();
-    const Vector3& spherePosition = sphereTransform.getPosition();
-    sphere.movement().position = glm::vec3(spherePosition.x, spherePosition.y, spherePosition.z);
-    sphere.move();
-    std::cout<<spherePosition.x<<", "<<spherePosition.y<<", "<<spherePosition.z<<std::endl; */
     
     m_world->update(_deltatime);
 
@@ -55,6 +55,10 @@ void Scene::update(float _deltatime, const Camera& _camera, GLuint _matrixID, GL
         entity.updateViewAndDraw(_camera, m_world, _matrixID, _modelMatrixID, _colorID, _hasTextureID);
     }
 
+    // for(DestructibleEntity * dstEntity : m_destructibles){
+    //     dstEntity->updateViewAndDraw(_camera, m_world, _matrixID, _modelMatrixID, _colorID, _hasTextureID);
+    // }
+
 }
 
 void Scene::clear(){
@@ -62,6 +66,10 @@ void Scene::clear(){
     for(Entity & entity : m_entities){
         entity.clear();
     }
+
+    // for(DestructibleEntity * dstEntity : m_destructibles){
+    //     dstEntity->clear();
+    // }
 
     m_physicsCommon.destroyPhysicsWorld(m_world);
 }
@@ -85,27 +93,37 @@ void Scene::setupTestScene(){
     // Simple sphere entity
     Entity sphere = Entity("../assets/entities/sphere.off");
     sphere.currentMesh().recomputeNormalsAndTexCoords();
-    sphere.currentMesh().hasTexture(false);
+    sphere.currentMesh().texture("../assets/map/rock.png");
+    sphere.currentMesh().hasTexture(true);
     sphere.currentMesh().color(glm::vec3(0.6f, 0.1f, 0.1f));
     sphere.movement().position = glm::vec3(0.0f, 40.f, 5.0f);
     sphere.move();
     m_entities.push_back(sphere);
 
-    sphere.currentMesh().hasTexture(false);
-    sphere.currentMesh().texture("../assets/map/rock.png");
+    sphere.currentMesh().hasTexture(true);
     sphere.movement().position = glm::vec3(0.0f, 30.f, 5.0f);
     sphere.move();
     m_entities.push_back(sphere);
 
-    sphere.currentMesh().hasTexture(false);
+    sphere.currentMesh().hasTexture(true);
     sphere.movement().position = glm::vec3(0.0f, 20.f, 5.0f);
     sphere.move();
     m_entities.push_back(sphere);
 
-    sphere.currentMesh().hasTexture(false);
+    sphere.currentMesh().hasTexture(true);
     sphere.movement().position = glm::vec3(0.0f, 10.f, 5.0f);
     sphere.move();
     m_entities.push_back(sphere);
+
+    FractureGenerator frtGen = FractureGenerator();
+    DestructibleEntity test = DestructibleEntity(&frtGen);
+
+    test.LoadBasic(0.1f);
+    test.movement().position = glm::vec3(0.0f, 40.f, 10.0f);
+    test.move();
+    test.currentMesh().color(glm::vec3(1.0f, 0.0f, 0.0f));
+    test.currentMesh().hasTexture(false);
+    m_destructibles.push_back(&test);
 
     //// Init each entities and give the possibilities to give options for physics
     init();

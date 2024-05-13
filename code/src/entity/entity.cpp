@@ -78,6 +78,7 @@ void Entity::loadEntity(reactphysics3d::PhysicsWorld* _world){
 void Entity::updateViewAndDraw(const Camera& _camera, reactphysics3d::PhysicsWorld* _world, GLuint _matrixID, GLuint _modelMatrixID, GLuint _colorID, GLuint _hasTextureID){
     glm::mat4 projectionMatrix = _camera.getProjectionMatrix();
     glm::mat4 viewMatrix = _camera.getViewMatrix();
+
     const reactphysics3d::Transform transform = m_physicalEntity->getTransform();
     float tmpModelMatrix[16];
     transform.getOpenGLMatrix(tmpModelMatrix);
