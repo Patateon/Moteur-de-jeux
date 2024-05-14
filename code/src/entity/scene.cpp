@@ -125,7 +125,7 @@ void Scene::setupTestScene(){
     DestructibleEntity test = DestructibleEntity(&frtGen);
 
     test.LoadBasic(2.0f);
-    test.movement().position = glm::vec3(0.0f, 40.f, 10.0f);
+    test.movement().position = glm::vec3(0.0f, 40.f, 50.0f);
     test.move();
     test.currentMesh().color(glm::vec3(1.0f, 0.0f, 0.0f));
     test.currentMesh().hasTexture(false);
@@ -162,7 +162,7 @@ void Scene::setupTestScene(){
     Collider* testEcranCollider = m_destructibles[0].physicalEntity()->addCollider(boxShape, Transform::identity());
 
     std::vector<DestructibleEntity*> listObject;
-    frtGen.Fracture(&m_destructibles[0], glm::vec2(0.3f, 0.6f), glm::vec3(0.0f, 0.0f, 1.0f), listObject, m_world, &m_physicsCommon);
+    frtGen.Fracture(&m_destructibles[0], glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), listObject, m_world, &m_physicsCommon);
 
     for(uint i = 0; i < listObject.size(); i++){
         m_destructibles.push_back(*listObject[i]);

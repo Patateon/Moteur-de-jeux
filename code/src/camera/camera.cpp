@@ -13,7 +13,7 @@ using namespace glm;
 void Camera::init()
 {
     m_fovDegree = 45.0f;
-    m_position = vec3(0.f, 40.f, 0.f);
+    m_position = vec3(0.f, 40.f, -40.f);
     getInitPosition() = m_position;
     m_eulerAngle = vec3(0.f, 0.f, 0.f);
     m_rotation = quat{};
