@@ -1,4 +1,13 @@
 
+#include <iostream>
+#include <reactphysics3d/collision/ConvexMesh.h>
+#include <reactphysics3d/collision/PolygonVertexArray.h>
+#include <reactphysics3d/collision/VertexArray.h>
+#include <reactphysics3d/collision/shapes/ConvexMeshShape.h>
+#include <reactphysics3d/engine/PhysicsCommon.h>
+#include <reactphysics3d/mathematics/Transform.h>
+#include <reactphysics3d/mathematics/Vector3.h>
+#include <reactphysics3d/utils/Message.h>
 #include <src/entity/destructibleEntity.hpp>
 
 
@@ -146,13 +155,10 @@ void DestructibleEntity::meshFromPolygon() {
             iNext = i + 1;
 
         newVertices[vi++] = glm::vec3(m_polygonFace[i].x, m_polygonFace[i].y, m_scale);
-        glm::vec3 test1 = newVertices[vi];
         newVertices[vi++] = glm::vec3(m_polygonFace[i].x, m_polygonFace[i].y, -m_scale);
 
         newVertices[vi++] = glm::vec3(m_polygonFace[iNext].x, m_polygonFace[iNext].y, -m_scale);
         newVertices[vi++] = glm::vec3(m_polygonFace[iNext].x, m_polygonFace[iNext].y, m_scale);
-
-
 
         normal = glm::normalize(glm::cross(glm::vec3(m_polygonFace[iNext] - m_polygonFace[i], 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
 
@@ -162,13 +168,27 @@ void DestructibleEntity::meshFromPolygon() {
         newNormal[ni++] = normal;
     }
 
+    // Pour chaque faces, (|Sommets du polyone| + 2)
+    /* for (int i = 0; i < count + 2; i++)
+    {
+        newFace[ti] = i;
+        newFace[ti+1] = i+1;
+        newFace[ti+2] = i+2;
+        ti += 3;
+
+        newFace[ti] = i;
+        newFace[ti+1] = i+2;
+        newFace[ti+2] = i+3;
+        ti += 3;
+    } */
+
     // Faces
     for (int vert = 2; vert < count; vert++)
     {
         newFace[ti] = 0;
         newFace[ti+1] = vert - 1;
         newFace[ti+2] = vert;
-        ti++;
+        ti+=3;
     }
 
     for (int vert = 2; vert < count; vert++)
@@ -176,7 +196,7 @@ void DestructibleEntity::meshFromPolygon() {
         newFace[ti] = count;
         newFace[ti+1] = count + vert;
         newFace[ti+2] = count + vert - 1;
-        ti++;
+        ti+=3;
     }
 
     for (int vert = 0; vert < count; vert++)
@@ -186,15 +206,90 @@ void DestructibleEntity::meshFromPolygon() {
         newFace[ti] = si;
         newFace[ti+1] = si + 1;
         newFace[ti+2] = si + 2;
-        ti++;
+        ti+=3;
 
         newFace[ti] = si;
         newFace[ti+1] = si + 2;
         newFace[ti+2] = si + 3;
-        ti++;
+        ti+=3;
     }
 
     currentMesh() = Mesh(newVertices, newFace);
     currentMesh().vertexNormals() = newNormal;
     currentMesh().vertexTexCoords() = newUV;
+}
+
+reactphysics3d::Collider* DestructibleEntity::createCollider(reactphysics3d::PhysicsCommon* physicsCommon){
+    using namespace reactphysics3d;
+
+    uint32 numberOfVertex = currentMesh().vertexPosition().size();
+    std::vector<glm::vec3> vertices = currentMesh().vertexPosition();
+    uint32 numberOfIndices = currentMesh().triangleIndices().size();
+    std::vector<unsigned short> us_indices = currentMesh().triangleIndices(); 
+
+    // VertexArray vertexArray(vertices.data(), 3 * sizeof(float),
+    //     numberOfVertex * 3, VertexArray::DataType::VERTEX_FLOAT_TYPE);
+
+
+    // Polygon face to specify indices structures
+    PolygonVertexArray::PolygonFace* polygonFace = new PolygonVertexArray::PolygonFace[numberOfIndices / 3];
+    PolygonVertexArray::PolygonFace* face = polygonFace;
+
+
+    for(uint i = 0; i < numberOfIndices; i++){
+        face[i].indexBase = i*3;
+        face[i].nbVertices = 3;
+    }
+
+    // Convert indice type from unsigned short to short
+    std::vector<short> indices;
+    indices.resize(numberOfIndices);
+    for(uint i = 0; i < numberOfIndices; i++){
+        indices[i] = (short) us_indices[i];
+    }
+    
+
+    // Created polygon vertex array
+    PolygonVertexArray polygonVertexArray(numberOfVertex / 3, vertices.data(), sizeof(float),
+        indices.data(), sizeof(short), (indices.size() / 3) / 3,
+        polygonFace, PolygonVertexArray::VertexDataType::VERTEX_FLOAT_TYPE, PolygonVertexArray::IndexDataType::INDEX_SHORT_TYPE);
+
+
+
+    std::vector<Message> messages;
+
+    ConvexMesh* convexMesh = physicsCommon->createConvexMesh(polygonVertexArray, messages);
+
+    // Display the messages (info, warning and errors)
+    if (messages.size() > 0) {
+    
+        for (const rp3d::Message& message: messages) {
+    
+            std::string messageType;
+    
+            switch(message.type) {
+    
+                case rp3d::Message::Type::Information:
+                    messageType = "info";
+                    break;
+                case rp3d::Message::Type::Warning:
+                    messageType = "warning";
+                    break;
+                case rp3d::Message::Type::Error:
+                    messageType = "error";
+                    break;
+            }
+    
+            std::cout << "Message (" << messageType << "): " << message.text << std::endl;
+        }
+    }
+
+    // Make sure there was no errors during mesh creation
+    assert(convexMesh != nullptr);
+
+    Vector3 scaling = Vector3(1.0f, 1.0f, 1.0f);
+
+    ConvexMeshShape* convexMeshShape = physicsCommon->createConvexMeshShape(convexMesh, scaling);
+
+    return physicalEntity()->addCollider(convexMeshShape, Transform::identity());
 }

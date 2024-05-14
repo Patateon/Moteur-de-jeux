@@ -38,6 +38,8 @@ private:
 
     reactphysics3d::RigidBody* m_physicalEntity;
 
+    bool m_shouldRender = true;
+
 public:
     Entity(){}
     Entity(Mesh mesh);
@@ -48,10 +50,16 @@ public:
     const Mesh & currentMesh() const { return m_currentMesh; }
 
     Movement & movement() { return m_movement; }
+    const Movement & movement() const { return m_movement; }
 
     transform::Transform & currentTransform() { return m_currentTransform; }
+    const transform::Transform & currentTransform() const { return m_currentTransform; }
 
     reactphysics3d::RigidBody* physicalEntity() { return m_physicalEntity; } 
+    const reactphysics3d::RigidBody* physicalEntity() const { return m_physicalEntity; } 
+
+    bool shouldRender() const { return m_shouldRender; }
+    void shouldRender(bool shouldRender) {m_shouldRender = shouldRender;}
 
     // Actualiser le mouvement, (Modifie la matrice model en conséquence)
     void move();

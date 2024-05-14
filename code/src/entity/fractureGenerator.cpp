@@ -1,4 +1,7 @@
 
+
+#include <reactphysics3d/engine/PhysicsCommon.h>
+#include <reactphysics3d/engine/PhysicsWorld.h>
 #include <reactphysics3d/mathematics/Vector3.h>
 #include <src/entity/destructibleEntity.hpp>
 #include <src/entity/fractureGenerator.hpp>
@@ -22,7 +25,11 @@ FractureGenerator::~FractureGenerator()
 {
 }
 
-bool FractureGenerator::Fracture(DestructibleEntity* object, const glm::vec2 hitPosition, const glm::vec3 hitDirection, std::vector<Entity*>& objectList)
+bool FractureGenerator::Fracture(DestructibleEntity* object,
+    const glm::vec2 hitPosition, const glm::vec3 hitDirection,
+    std::vector<DestructibleEntity*>& objectList,
+    reactphysics3d::PhysicsWorld* world,
+    reactphysics3d::PhysicsCommon* physicCommon)
 {
     const int fractureDepth = object->GetFractureDepth();
     if (object->IsDestroyed() || fractureDepth > m_maxFratureDepth)
@@ -92,7 +99,7 @@ bool FractureGenerator::Fracture(DestructibleEntity* object, const glm::vec2 hit
             jcv_clippingPolygon.num_points = vertexAmount;
             free(jcv_clippingPolygon.points);
             jcv_clippingPolygon.points = (jcv_point*)malloc(sizeof(jcv_point) * (size_t)vertexAmount);
-            // Polygon recived from object
+            // Polygon received from object
             for (int i = 0; i < (size_t)jcv_clippingPolygon.num_points; i++)
             {
                 jcv_clippingPolygon.points[i].x = hitPolygon[i].x;
@@ -178,26 +185,27 @@ bool FractureGenerator::Fracture(DestructibleEntity* object, const glm::vec2 hit
                 newObject->SetScale(scale);
                 newObject->SetFractureDepth(fractureDepth + 1);
 
+                newObject->currentMesh() = *newMesh;
+
                 reactphysics3d::Transform newTransform = object->physicalEntity()->getTransform();
 
                 // Create mesh
-                glm::vec3 center = object->currentMesh().getBarycentre();
-
-                newObject->currentMesh().init();
+                glm::vec3 center = newObject->currentMesh().getBarycentre();
 
                 // Fix placement
-                glm::vec3 sitePosition = glm::vec3(sites[i].p.x, sites[i].p.y, 0.0f);
+                // glm::vec3 sitePosition = glm::vec3(sites[i].p.x, sites[i].p.y, 0.0f);
                 reactphysics3d::Vector3 currentPosition = newTransform.getPosition();
-                newTransform.setPosition(currentPosition + reactphysics3d::Vector3(center.x, center.y, center.z));
+                // newTransform.setPosition(currentPosition + reactphysics3d::Vector3(center.x, center.y, center.z));
 
-                // Debug placement and scale
-                float debugOffset = 0.08f;
-                //newTransform.position += (sitePosition * debugOffset - (glm::vec3(hitPosition, 0.0f) * debugOffset)) * glm::inverse(newTransform.rotation);
-                //newTransform.position += (sitePosition * 2.2f);
-                //newTransform.scale *= 0.92f;
+                glm::vec3 curPos = glm::vec3(currentPosition.x, currentPosition.y, currentPosition.z);
+                newObject->movement().position = curPos;
+                newObject->move();
 
-                newObject->physicalEntity()->setTransform(newTransform);
+                newObject->loadEntity(world);
 
+                newObject->createCollider(physicCommon);
+
+                objectList.push_back(newObject);
             }
         }
 
@@ -207,6 +215,8 @@ bool FractureGenerator::Fracture(DestructibleEntity* object, const glm::vec2 hit
         //free(clipper);
         free(jcv_clippingPolygon.points);
         free(j_points);
+
+        object->SetDestroyed(true);
 
 
         return true;
@@ -293,13 +303,13 @@ bool FractureGenerator::MeshFromSite(Mesh*& mesh, const float& scale, const std:
 
         std::vector<glm::vec3> newVertices;
         std::vector<glm::vec3> newNormals;
-        std::vector<glm::vec2> newUV;
 
         std::vector<unsigned short> newFaces;
         glm::vec3 normal;
 
         newVertices.resize(6 * (size_t)vertexCount);
-        newFaces.resize(4 * (size_t)vertexCount - 4);
+        newNormals.resize(6 * (size_t)vertexCount);
+        newFaces.resize(3 * (4 * (size_t)vertexCount - 4));
 
         int vi = 0;		// Vertex index
         int uvi = 0;	// UV index
@@ -367,7 +377,7 @@ bool FractureGenerator::MeshFromSite(Mesh*& mesh, const float& scale, const std:
             newFaces[fi] = 0;
             newFaces[fi+1] = vert - 1;
             newFaces[fi+2] = vert;
-            fi++;
+            fi+=3;
         }
 
         for (int vert = 2; vert < vertexCount; vert++)
@@ -375,7 +385,7 @@ bool FractureGenerator::MeshFromSite(Mesh*& mesh, const float& scale, const std:
             newFaces[fi] = vertexCount;
             newFaces[fi+1] = vertexCount + vert;
             newFaces[fi+2] = vertexCount + vert - 1;
-            fi++;
+            fi+=3;
         }
 
         for (int vert = 0; vert < vertexCount; vert++)
@@ -385,12 +395,12 @@ bool FractureGenerator::MeshFromSite(Mesh*& mesh, const float& scale, const std:
             newFaces[fi] = si;
             newFaces[fi+1] = si + 1;
             newFaces[fi+2] = si + 2;
-            fi++;
+            fi+=3;
 
             newFaces[fi] = si;
             newFaces[fi+1] = si + 2;
             newFaces[fi+2] = si + 3;
-            fi++;
+            fi+=3;
         }
 
 
@@ -412,154 +422,6 @@ bool FractureGenerator::MeshFromSite(Mesh*& mesh, const float& scale, const std:
 
     return false;
 }
-
-/* void FractureGenerator::ApplyPhysicsProjectile(DestructibleEntity* object, const glm::vec2& hitPosition, const glm::vec3& center, const glm::vec3& hitDirection, const int& mi)
-{
-    // Best with radius 3
-
-
-    const Transform& newTransform = object->GetRigidTransform(0);
-    float forceAll_mod = m_forceAll_mod;
-    float forceAway_str = 1;
-    float forceHit_str = 30;
-    float distance = 1.0f + glm::length(center - glm::vec3(hitPosition, 0.0f));
-
-    float distanceMod = 1.0;
-    if (distanceMod > 0)
-    {
-        //forceHit_str *= 1 /  ((1 - distanceMod) * 0.0f + distanceMod * 1.0f);// glm::lerp(0.0f, 1.0f, distanceMod);
-        forceHit_str *= 1 / std::powf(10.0f + distance, 1.0);
-        forceAway_str *= 1 / std::powf(distance, 1.2);
-    }
-
-    //forceHit_str = std::powf(forceHit_str, 2);
-
-    glm::vec3 forceAway_dir = glm::normalize(center - glm::vec3(hitPosition, 0.0f)) * glm::inverse(newTransform.rotation);
-    forceAway_dir *= forceAway_str;
-
-    // Randomize force
-    float randRange = 0.3f;
-    float forceRand = 1 + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
-
-    //float spinForce_mod = 0.2f * (forceAll_mod / 4);
-    float spinForce_mod = 0.4f * (forceAll_mod / 4) * (std::powf(distance, 1.2));
-    glm::vec3 spinVector = glm::normalize(glm::cross(center - glm::vec3(hitPosition, 0.0f), -hitDirection));
-    glm::vec3 forceSpin = spinVector * spinForce_mod * forceRand;
-    
-    //float dirRnd = (float)(rand() / (1.0f + RAND_MAX) * spinForce) - (spinForce / 2);
-
-    glm::vec3 force = (forceAway_dir + (hitDirection * forceHit_str)) * forceAll_mod * forceRand;
-    btRigidBody* body = object->getRigidBody(mi);
-    if (body)
-    {
-        //body->applyCentralImpulse(btVector3(force.x, force.y, force.z));
-        body->setLinearVelocity(btVector3(force.x * 0.2, force.y * 0.2, force.z * 0.2));
-        //body->setAngularVelocity(body->getAngularVelocity() + btVector3(forceSpin.x, forceSpin.y, forceSpin.z));
-        body->applyTorqueImpulse(btVector3(forceSpin.x, forceSpin.y, forceSpin.z));
-    }
-}
-void FractureGenerator::ApplyPhysicsExplosion(DestructibleEntity* object, const glm::vec2& hitPosition, const glm::vec3& center, const glm::vec3& hitDirection, const int& mi)
-{
-    float forceAll_mod = m_forceAll_mod;
-    float forceAway_str = 1;
-    float forceHit_str = 15;
-
-    float distanceMod = 1.0 + std::powf(glm::length(center - glm::vec3(hitPosition, 0.0f)), 1.6f);
-    if (distanceMod > 0)
-    {
-        //forceHit_str *= 1 /  ((1 - distanceMod) * 0.0f + distanceMod * 1.0f);// glm::lerp(0.0f, 1.0f, distanceMod);
-        forceHit_str *= 1 / distanceMod;
-        forceAway_str *= std::powf(distanceMod, 1.4f);
-    }
-
-    glm::vec3 forceAway_dir = glm::normalize(center - glm::vec3(hitPosition, 0.0f));
-    forceAway_dir *= forceAway_str;
-
-    // Randomize force
-    float randRange = 0.3f;
-    float forceRand = 1 + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
-
-    //float spinForce_mod = 0.2f * (forceAll_mod / 4);
-    float spinForce_mod = 1.55f * (forceAll_mod / 4);
-    glm::vec3 spinVector = glm::normalize(glm::cross(center - glm::vec3(hitPosition, 0.0f), -hitDirection));
-    glm::vec3 forceSpin = spinVector * spinForce_mod * forceRand;
-
-    spinVector.x = (2 * (float)rand() / (float)RAND_MAX - 1) * forceAll_mod;
-    spinVector.y = (2 * (float)rand() / (float)RAND_MAX - 1) * forceAll_mod;
-    spinVector.z = (2 * (float)rand() / (float)RAND_MAX - 1) * forceAll_mod;
-
-
-    //float dirRnd = (float)(rand() / (1.0f + RAND_MAX) * spinForce) - (spinForce / 2);
-
-    glm::vec3 force = (forceAway_dir + (hitDirection * forceHit_str)) * forceAll_mod * forceRand;
-    btRigidBody* body = object->getRigidBody(mi);
-    if (body)
-    {
-        body->applyCentralImpulse(btVector3(force.x, force.y, force.z));
-        //body->setLinearVelocity(btVector3(force.x * 0.2, force.y * 0.2, force.z * 0.2));
-        //body->setAngularVelocity(body->getAngularVelocity() + btVector3(forceSpin.x, forceSpin.y, forceSpin.z));
-        body->applyTorqueImpulse(btVector3(spinVector.x, spinVector.y, spinVector.z));
-    }
-} */
-
-/* void FractureGenerator::ApplyPhysicsFracture(DestructibleEntity* object, const glm::vec2& hitPosition, const glm::vec3& center, const glm::vec3& hitDirection, const int& mi)
-{
-    const Transform& newTransform = object->GetRigidTransform(0);
-    float forceAll_mod = 10.0;
-    float forceAway_str = 1.0;
-    float forceHit_str = 10;
-    float distance = 1.0f + glm::length(center - glm::vec3(hitPosition, 0.0f));
-
-    float distanceMod = 1.0;
-    if (distanceMod > 0)
-    {
-        //forceHit_str *= 1 /  ((1 - distanceMod) * 0.0f + distanceMod * 1.0f);// glm::lerp(0.0f, 1.0f, distanceMod);
-        //forceHit_str *= 1 / std::powf(distance / 8, 1.4f);
-        //forceAway_str += std::powf(distance / 8, 1.5f);
-
-        forceAway_str *= std::fminf((1.0f + (distance / 12)), 10.0f);
-
-        forceHit_str /= distance;
-
-    }
-
-    glm::vec3 forceAway_dir = glm::normalize(center - glm::vec3(hitPosition, 0.0f)) * glm::inverse(newTransform.rotation);
-    forceAway_dir *= forceAway_str;
-
-
-    //float dirRnd = (float)(rand() / (1.0f + RAND_MAX) * spinForce) - (spinForce / 2);
-    //float spinForce_mod = 0.2f * (forceAll_mod / 4);
-    // Randomize force
-    float randRange = 0.5f;
-    float forceRand = 1.0f + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
-
-    glm::vec3 spinVector = glm::normalize(glm::cross(center - glm::vec3(hitPosition, 0.0f), -hitDirection));
-    spinVector.x = (2 * (float)rand() / (float)RAND_MAX - 1) * 1.0f; // * (distance / 2);
-    spinVector.y = (2 * (float)rand() / (float)RAND_MAX - 1) * 1.0f; // * (distance / 2);
-    spinVector.z = (2 * (float)rand() / (float)RAND_MAX - 1) * 1.0f; // * (distance / 2);
-    spinVector.x *= 1.0f + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
-    spinVector.y *= 1.0f + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
-    spinVector.z *= 1.0f + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
-
-    glm::vec3 forceSpin = spinVector * (m_forceAll_mod / 40);
-    forceSpin *= (distance * 5);
-
-    glm::vec3 force = (forceAway_dir + (hitDirection * forceHit_str)) * m_forceAll_mod;
-    force.x *= 1 + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
-    force.y *= 1 + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
-    force.z *= 1 + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
-
-    btRigidBody* body = object->getRigidBody(mi);
-    if (body)
-    {	
-        body->applyCentralImpulse(btVector3(force.x, force.y, force.z));
-        //body->setLinearVelocity(btVector3(force.x * 0.2, force.y * 0.2, force.z * 0.2));
-        //body->setAngularVelocity(body->getAngularVelocity() + btVector3(forceSpin.x, forceSpin.y, forceSpin.z));
-        //body->setAngularVelocity(btVector3(forceSpin.x, forceSpin.y, forceSpin.z));
-        //body->applyTorqueImpulse(btVector3(spinVector.x, spinVector.y, spinVector.z));
-        body->applyTorqueImpulse(btVector3(forceSpin.x, forceSpin.y, forceSpin.z));
-    }
-} */
 
 const unsigned int FractureGenerator::seedRand(int seed)
 {

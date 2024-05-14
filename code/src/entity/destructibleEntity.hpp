@@ -31,13 +31,14 @@ public:
 	void SetPolygon(std::vector <glm::vec2> vertices);
 	void SetScale(float scale);
 
-
 	void setLifetime(float time) { m_lifetime = time; }
 	void SetDestroyed(bool state) { m_destroyed = state; }
 	void SetFractureDepth(int depth) { m_fractureDepth = depth; }
 
 	void CalculateMinMax();
 	void meshFromPolygon();
+
+	reactphysics3d::Collider* createCollider(reactphysics3d::PhysicsCommon* physicsCommon);
 
 	// Get
 	const std::vector<glm::vec2>& GetPolygon() const { return m_polygonFace; }

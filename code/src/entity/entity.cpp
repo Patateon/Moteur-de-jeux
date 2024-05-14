@@ -76,22 +76,29 @@ void Entity::loadEntity(reactphysics3d::PhysicsWorld* _world){
 }
 
 void Entity::updateViewAndDraw(const Camera& _camera, reactphysics3d::PhysicsWorld* _world, GLuint _matrixID, GLuint _modelMatrixID, GLuint _colorID, GLuint _hasTextureID){
-    glm::mat4 projectionMatrix = _camera.getProjectionMatrix();
-    glm::mat4 viewMatrix = _camera.getViewMatrix();
+    
+    if (m_shouldRender){
+        m_physicalEntity->setIsActive(true);
 
-    const reactphysics3d::Transform transform = m_physicalEntity->getTransform();
-    float tmpModelMatrix[16];
-    transform.getOpenGLMatrix(tmpModelMatrix);
-    glm::mat4 modelMatrix = glm::make_mat4(tmpModelMatrix);
-    modelMatrix = modelMatrix * glm::scale(glm::mat4(), currentTransform().scale);
+        glm::mat4 projectionMatrix = _camera.getProjectionMatrix();
+        glm::mat4 viewMatrix = _camera.getViewMatrix();
 
-    glm::mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
+        const reactphysics3d::Transform transform = m_physicalEntity->getTransform();
+        float tmpModelMatrix[16];
+        transform.getOpenGLMatrix(tmpModelMatrix);
+        glm::mat4 modelMatrix = glm::make_mat4(tmpModelMatrix);
+        modelMatrix = modelMatrix * glm::scale(glm::mat4(), currentTransform().scale);
 
-    // Send our transformation to the currently bound shader, 
-    // in the "MVP" uniform
-    glUniformMatrix4fv(_matrixID, 1, GL_FALSE, &MVP[0][0]);
-    glUniformMatrix4fv(_modelMatrixID, 1, GL_FALSE, &modelMatrix[0][0]);
-    currentMesh().render(_colorID, _hasTextureID);
+        glm::mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
+
+        // Send our transformation to the currently bound shader, 
+        // in the "MVP" uniform
+        glUniformMatrix4fv(_matrixID, 1, GL_FALSE, &MVP[0][0]);
+        glUniformMatrix4fv(_modelMatrixID, 1, GL_FALSE, &modelMatrix[0][0]);
+        currentMesh().render(_colorID, _hasTextureID);
+    }else{
+        m_physicalEntity->setIsActive(false);        
+    }
 }
 
 void Entity::clear(){

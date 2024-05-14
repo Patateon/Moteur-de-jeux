@@ -25,7 +25,7 @@ public:
 	FractureGenerator();
 	~FractureGenerator();
 
-	bool Fracture(DestructibleEntity * object, const glm::vec2 hitPosition, const glm::vec3 hitDirection, std::vector<Entity*>& objectList);
+	bool Fracture(DestructibleEntity * object, const glm::vec2 hitPosition, const glm::vec3 hitDirection, std::vector<DestructibleEntity*>& objectList, reactphysics3d::PhysicsWorld* world, reactphysics3d::PhysicsCommon* physicCommon);
 
 	void SetPointAmount(int amount);
 	void SetRadiusSize(float radius);
