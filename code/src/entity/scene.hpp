@@ -9,6 +9,7 @@
 
 // Personal libs
 #include <src/entity/heightmap.hpp>
+#include <src/camera//skybox.hpp>
 
 // ReactPhysics3D
 #include <reactphysics3d/reactphysics3d.h>
@@ -17,6 +18,7 @@ class Scene
 {
 private:
     HeightMap m_heightMap;
+    //SkyBox m_skybox;
     std::vector<Entity> m_entities;
     std::vector<DestructibleEntity> m_destructibles;
 
@@ -29,6 +31,7 @@ public:
     ~Scene();
 
     void init();
+    //void initSkybox();
     void update(float _deltatime, const Camera& _camera, GLuint _matrixID, GLuint _modelMatrixID, GLuint _colorID, GLuint _hasTextureID);
     void clear();
 

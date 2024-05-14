@@ -19,6 +19,7 @@
 #include <src/entity/scene.hpp>
 #include <src/entity/entity.hpp>
 #include <src/entity/heightmap.hpp>
+#include <src/camera//skybox.hpp>
 
 #include <string>
 #include <vector>
@@ -43,6 +44,7 @@ void Scene::init(){
     for(DestructibleEntity & dstEntity : m_destructibles){
         dstEntity.loadEntity(m_world);
     }
+    //initSkybox();
 }
 
 void Scene::update(float _deltatime, const Camera& _camera, GLuint _matrixID, GLuint _modelMatrixID, GLuint _colorID, GLuint _hasTextureID){
@@ -59,6 +61,8 @@ void Scene::update(float _deltatime, const Camera& _camera, GLuint _matrixID, GL
     for(DestructibleEntity & dstEntity : m_destructibles){
         dstEntity.updateViewAndDraw(_camera, m_world, _matrixID, _modelMatrixID, _colorID, _hasTextureID);
     }
+
+    //m_skybox.renderSkyBox(_camera,_matrixID);
 
 }
 
@@ -171,3 +175,21 @@ void Scene::setupTestScene(){
     //// Initial forces settings
     m_entities[0].physicalEntity()->applyLocalForceAtCenterOfMass(Vector3(0.0, 0.0, 150.0));
 }
+/*
+void Scene::initSkybox() {
+    // Charger les faces de la skybox
+    std::vector<std::string> faces {
+        "../assets/skyboxes/Meadow/posx.jpg",
+        "../assets/skyboxes/Meadow/negx.jpg",
+        "../assets/skyboxes/Meadow/posy.jpg",
+        "../assets/skyboxes/Meadow/negy.jpg",
+        "../assets/skyboxes/Meadow/posz.jpg",
+        "../assets/skyboxes/Meadow/negz.jpg"
+    };
+
+    // Charger la skybox
+    if (!m_skybox.loadSkyBox(faces)) {
+        // Gérer les erreurs si le chargement de la skybox échoue
+        std::cerr << "Failed to load skybox." << std::endl;
+    }
+}*/
