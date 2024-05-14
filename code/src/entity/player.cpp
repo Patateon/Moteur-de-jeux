@@ -13,7 +13,3 @@ Player::Player(Scene * _scene, Camera * _camera){
 Player::~Player(){
     clear();
 }
-
-void Player::updateInput(){
-
-}
