@@ -227,38 +227,38 @@ reactphysics3d::Collider* DestructibleEntity::createCollider(reactphysics3d::Phy
     uint32 numberOfIndices = currentMesh().triangleIndices().size();
     std::vector<unsigned short> us_indices = currentMesh().triangleIndices(); 
 
-    // VertexArray vertexArray(vertices.data(), 3 * sizeof(float),
-    //     numberOfVertex * 3, VertexArray::DataType::VERTEX_FLOAT_TYPE);
+    VertexArray vertexArray(vertices.data(), 3 * sizeof(float),
+        numberOfVertex, VertexArray::DataType::VERTEX_FLOAT_TYPE);
 
 
     // Polygon face to specify indices structures
-    PolygonVertexArray::PolygonFace* polygonFace = new PolygonVertexArray::PolygonFace[numberOfIndices / 3];
-    PolygonVertexArray::PolygonFace* face = polygonFace;
+    // PolygonVertexArray::PolygonFace* polygonFace = new PolygonVertexArray::PolygonFace[numberOfIndices / 3];
+    // PolygonVertexArray::PolygonFace* face = polygonFace;
 
 
-    for(uint i = 0; i < numberOfIndices; i++){
-        face[i].indexBase = i*3;
-        face[i].nbVertices = 3;
-    }
+    // for(uint i = 0; i < numberOfIndices; i++){
+    //     face[i].indexBase = i*3;
+    //     face[i].nbVertices = 3;
+    // }
 
-    // Convert indice type from unsigned short to short
-    std::vector<short> indices;
-    indices.resize(numberOfIndices);
-    for(uint i = 0; i < numberOfIndices; i++){
-        indices[i] = (short) us_indices[i];
-    }
+    // // Convert indice type from unsigned short to short
+    // std::vector<short> indices;
+    // indices.resize(numberOfIndices);
+    // for(uint i = 0; i < numberOfIndices; i++){
+    //     indices[i] = (short) us_indices[i];
+    // }
     
 
-    // Created polygon vertex array
-    PolygonVertexArray polygonVertexArray(numberOfVertex / 3, vertices.data(), sizeof(float),
-        indices.data(), sizeof(short), (indices.size() / 3) / 3,
-        polygonFace, PolygonVertexArray::VertexDataType::VERTEX_FLOAT_TYPE, PolygonVertexArray::IndexDataType::INDEX_SHORT_TYPE);
+    // // Created polygon vertex array
+    // PolygonVertexArray polygonVertexArray(numberOfVertex / 3, vertices.data(), sizeof(float),
+    //     indices.data(), sizeof(short), (indices.size() / 3) / 3,
+    //     polygonFace, PolygonVertexArray::VertexDataType::VERTEX_FLOAT_TYPE, PolygonVertexArray::IndexDataType::INDEX_SHORT_TYPE);
 
 
 
     std::vector<Message> messages;
 
-    ConvexMesh* convexMesh = physicsCommon->createConvexMesh(polygonVertexArray, messages);
+    ConvexMesh* convexMesh = physicsCommon->createConvexMesh(vertexArray, messages);
 
     // Display the messages (info, warning and errors)
     if (messages.size() > 0) {

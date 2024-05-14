@@ -200,6 +200,8 @@ bool FractureGenerator::Fracture(DestructibleEntity* object,
                 glm::vec3 curPos = glm::vec3(currentPosition.x, currentPosition.y, currentPosition.z);
                 newObject->movement().position = curPos;
                 newObject->move();
+                newObject->currentMesh().color(object->currentMesh().color());
+                newObject->currentMesh().hasTexture(false);
 
                 newObject->loadEntity(world);
 
