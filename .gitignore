@@ -1,1 +1,6 @@
 code/build
+code/main/main
+code/.cache
+code/CMakeFiles
+.vscode
+build

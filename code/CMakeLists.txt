@@ -3,10 +3,11 @@ cmake_minimum_required (VERSION 3.0)
 project (Moteur-de-jeux)
 
 find_package(OpenGL REQUIRED)
+find_package(ReactPhysics3D REQUIRED) 
 
 
 if( CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR )
-    message( FATAL_ERROR "Please select another Build Directory ! (and give it a clever name, like bin_Visual2012_64bits/)" )
+    message( FATAL_ERROR "Please select another Build Directory !" )
 endif()
 if( CMAKE_SOURCE_DIR MATCHES " " )
     message( "Your Source Directory contains spaces. If you experience problems when compiling, this can be the cause." )
@@ -14,7 +15,6 @@ endif()
 if( CMAKE_BINARY_DIR MATCHES " " )
     message( "Your Build Directory contains spaces. If you experience problems when compiling, this can be the cause." )
 endif()
-
 
 
 # Compile external dependencies 
@@ -25,6 +25,10 @@ cmake_policy(SET CMP0026 OLD)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/rpavlik-cmake-modules-fe2273")
 include(CreateLaunchers)
 include(MSVCMultipleProcessCompile) # /MP
+
+# Pour faire fonctionner clang (pas nécessaire sans clang)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 
 if(INCLUDE_DISTRIB)
     add_subdirectory(distrib)
@@ -54,46 +58,71 @@ add_definitions(
 )
 
 # main
-file( GLOB IMGUIC imgui/*.cpp) 
-file( GLOB IMGUIH imgui/*.h) 
+file( GLOB IMGUIC external/imgui/*.cpp) 
+file( GLOB IMGUIH external/imgui/*.h) 
 add_executable(main
     main/main.cpp
-	common/stb_image.cpp
-	common/stb_image.h
-    common/mesh.cpp
-    common/mesh.hpp
-    common/transform.cpp
-    common/transform.hpp
-    common/shader.cpp
-    common/shader.hpp
-    common/texture.cpp
-    common/texture.hpp
-    common/objloader.cpp
-    common/objloader.hpp
-    common/vboindexer.cpp
-    common/vboindexer.hpp
-    common/quaternion_utils.cpp
-    common/quaternion_utils.hpp
 
-    main/Actor/Actor.cpp
-    main/Actor/Actor.hpp
+    # Main components
+    src/common/control.hpp
+    src/common/control.cpp
+    src/common/jc_voronoi_clip.h
+    src/common/jc_voronoi.h
+    src/common/mesh.cpp
+    src/common/mesh.hpp
+    src/common/objloader.cpp
+    src/common/objloader.hpp
+    src/common/quaternion_utils.cpp
+    src/common/quaternion_utils.hpp
+    src/common/shader.cpp
+    src/common/shader.hpp
+	src/common/stb_image.cpp
+	src/common/stb_image.h
+    src/common/texture.cpp
+    src/common/texture.hpp
+    src/common/vboindexer.cpp
+    src/common/vboindexer.hpp
 
-    main/Camera/Camera.cpp
-    main/Camera/Camera.hpp
-    main/Camera/Camera_Helper.cpp
-    main/Camera/Camera_Helper.hpp
+    # Entity Components
+    src/entity/destructibleEntity.cpp
+    src/entity/destructibleEntity.hpp
+    src/entity/entity.cpp
+    src/entity/entity.hpp
+    src/entity/fractureGenerator.cpp
+    src/entity/fractureGenerator.hpp
+    src/entity/heightmap.cpp
+    src/entity/heightmap.hpp
+    src/entity/scene.cpp
+    src/entity/scene.hpp
 
-    main/Actor/ObjController.cpp
-    main/Actor/ObjController.hpp
-    
-    main/vertex_shader.glsl
-    main/fragment_shader.glsl
+    # Physic engine
+    src/physics/physicworld.cpp
+    src/physics/physicworld.hpp
+    src/physics/transform.cpp
+    src/physics/transform.hpp
+
+    # Actor components (not used)
+    src/actor/actor.cpp
+    src/actor/actor.hpp
+    src/actor/objcontroller.cpp
+    src/actor/objcontroller.hpp
+
+    # Camera components
+    src/camera/camera.cpp
+    src/camera/camera.hpp
+    src/camera/camerahelper.cpp
+    src/camera/camerahelper.hpp
+
+    # Shaders parts
+    src/shaders/vertex_shader.glsl
+    src/shaders/fragment_shader.glsl
         ${IMGUIH}
         ${IMGUIC}
 )
 target_link_libraries(main
     ${ALL_LIBS}
 )
+target_link_libraries(main ReactPhysics3D::ReactPhysics3D)
 # Xcode and Visual working directories
 set_target_properties(main PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/main/")
 create_target_launcher(main WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/main/")

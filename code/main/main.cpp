@@ -1,37 +1,45 @@
 // Include standard headers
+#include "src/entity/scene.hpp"
+#include <reactphysics3d/body/RigidBody.h>
+#include <reactphysics3d/engine/PhysicsCommon.h>
+#include <reactphysics3d/engine/PhysicsWorld.h>
+#include <reactphysics3d/mathematics/Quaternion.h>
+#include <reactphysics3d/mathematics/Transform.h>
+#include <reactphysics3d/mathematics/Vector3.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <vector>
-#include <iostream>
 
 // Include GLEW
 #include <GL/glew.h>
 
 // Include GLFW
 #include <GLFW/glfw3.h>
+#include <sys/types.h>
 GLFWwindow* window;
 
 // Include GLM
 #include <glm/glm.hpp>
+#include <glm/detail/type_vec.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 
 // Include GLM
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
+#include <external/imgui/imgui.h>
+#include <external/imgui/imgui_impl_glfw.h>
+#include <external/imgui/imgui_impl_opengl3.h>
 
 // Include Main
-#include <main/Actor/Actor.hpp>
-#include <main/Actor/ObjController.hpp>
-#include "main/Camera/Camera.hpp"
+#include <src/common/control.hpp>
+#include <src/actor/actor.hpp>
+#include <src/actor/objcontroller.hpp>
+#include <src/camera/camera.hpp>
 
-using namespace glm;
+#include <src/entity/heightmap.hpp>
+#include <src/common/objloader.hpp>
+#include <src/common/shader.hpp>
+#include <src/common/texture.hpp>
+#include <src/common/vboindexer.hpp>
 
-#include <common/shader.hpp>
-#include <common/objloader.hpp>
-#include <common/vboindexer.hpp>
-#include <common/texture.hpp>
+#include <src/physics/physicworld.hpp>
 
 #include <unistd.h>
 #define Sleep(x) usleep((x)*1000)
@@ -49,7 +57,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 GLFWwindow* initWindow();
 void windowSetup();
 void initImgui();
-void updateLightPosition(GLuint _lightID);
+void updateLightPosition(GLuint _lightID, GLuint _lightColorID);
 
 int main(void)
 {
@@ -61,33 +69,39 @@ int main(void)
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
-    GLuint programID = LoadShaders("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
+    GLuint programID = LoadShaders("../src/shaders/vertex_shader.glsl",
+                                    "../src/shaders/fragment_shader.glsl");
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
     GLuint ViewMatrixID = glGetUniformLocation(programID, "V");
     GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
-    GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
+    GLuint LightID = glGetUniformLocation(programID, "lightPosition_worldspace");
+    GLuint LightColorID = glGetUniformLocation(programID, "lightColor");
+    GLuint CameraPositionID = glGetUniformLocation(programID, "cameraPosition");
+    GLuint hasTextureID = glGetUniformLocation(programID, "hasTexture");
     GLuint colorID = glGetUniformLocation(programID, "color_Mesh");
+    GLuint textureID = glGetUniformLocation(programID, "texture_Mesh");
 
     /****************************************/  
 
-
-    //Chargement du fichier de maillage
-    ObjController map;
-    Actor target;
-
-    map.loadObj("../assets/myMap2.obj", glm::vec3(0.6f, 0.5f, 0.3f), colorID);
-    target.load("../assets/cameraTarget.obj", glm::vec3(0.8f, 0.5f, 0.4f), colorID);
-
-
     glUseProgram(programID);
+
+    // Init Scene
+    Scene currentScene;
+    Camera myCamera;
+
+    Context ctx;
+    ctx.camera = &myCamera;
+    ctx.scene = &currentScene;
+    glfwSetWindowUserPointer(window, &ctx);
 
     // Init ImGUI
     initImgui();
 
     // Init Camera
-    Camera myCamera;
-    //[Camera] Aller plus loin : loader une position, rotation et fov ?
     myCamera.init();
+
+    // Setup Scene
+    currentScene.setupTestScene();
 
     // For speed computation
     double lastTime = glfwGetTime();
@@ -104,8 +118,6 @@ int main(void)
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // input
-
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -118,18 +130,18 @@ int main(void)
         ImGui::NewFrame();
 
         // Update
-        target.update(deltaTime, window, myCamera.getRotation());
+        // target.update(deltaTime, window, myCamera.getRotation());
         myCamera.update(deltaTime, window);
+        currentScene.update(deltaTime, myCamera, MatrixID, ModelMatrixID, colorID, hasTextureID);
 
+        glm::vec3 cameraPosition = myCamera.getPosition();
+        glUniform3f(CameraPositionID, cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
         glm::mat4 viewMatrix = myCamera.getViewMatrix();
         glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &viewMatrix[0][0]);
 
         //View
-        updateLightPosition(LightID);
-
-        map.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID);
-        target.updateViewAndDraw(myCamera, MatrixID, ModelMatrixID); 
+        updateLightPosition(LightID, LightColorID);
 
         // Renders the ImGUI elements
         ImGui::Render();
@@ -154,12 +166,10 @@ int main(void)
     ImGui::DestroyContext();
 
     // Cleanup VBO and shader
-
     glDeleteProgram(programID);
-    //glDeleteTextures(1, &Texture);
+    glDeleteTextures(1, &textureID);
     glDeleteVertexArrays(1, &VertexArrayID);
-    map.deleteBuffer();
-    target.destroy();
+
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
 
@@ -235,7 +245,7 @@ void windowSetup()
     //glfwSetCursorPos(window, 1024 / 2, 768 / 2);
 
     // Dark blue background
-    glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
+    glClearColor(0.45f, 0.45f, 0.45f, 0.0f);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
@@ -243,7 +253,7 @@ void windowSetup()
     glDepthFunc(GL_LESS);
 
     // Cull triangles which normal is not towards the camera
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
 }
 
 void initImgui()
@@ -256,8 +266,10 @@ void initImgui()
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-void updateLightPosition(GLuint _lightID)
+void updateLightPosition(GLuint _lightID, GLuint _lightColorID)
 {
-    const glm::vec3 lightPos = glm::vec3(4.f, 90.f, 4.f);
+    const glm::vec3 lightPos = glm::vec3(4.f, 400.f, 4.f);
+    const glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
     glUniform3f(_lightID, lightPos.x, lightPos.y, lightPos.z);
+    glUniform3f(_lightColorID, lightColor.x, lightColor.y, lightColor.z);
 }
