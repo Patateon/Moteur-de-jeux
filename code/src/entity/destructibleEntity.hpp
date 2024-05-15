@@ -39,6 +39,7 @@ public:
 	void meshFromPolygon();
 
 	reactphysics3d::Collider* createCollider(reactphysics3d::PhysicsCommon* physicsCommon);
+	reactphysics3d::Collider* createCollider(reactphysics3d::Vector3 scaling, reactphysics3d::PhysicsCommon* physicsCommon);
 
 	// Get
 	const std::vector<glm::vec2>& GetPolygon() const { return m_polygonFace; }

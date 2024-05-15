@@ -22,6 +22,8 @@ private:
     std::vector<Entity> m_entities;
     std::vector<DestructibleEntity> m_destructibles;
 
+    FractureGenerator m_fractureGenerator;
+
     reactphysics3d::PhysicsCommon m_physicsCommon;
     reactphysics3d::PhysicsWorld* m_world;
     std::vector<reactphysics3d::RigidBody*> m_bodies;

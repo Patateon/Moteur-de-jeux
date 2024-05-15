@@ -27,6 +27,8 @@ public:
 
 	bool Fracture(DestructibleEntity * object, const glm::vec2 hitPosition, const glm::vec3 hitDirection, std::vector<DestructibleEntity*>& objectList, reactphysics3d::PhysicsWorld* world, reactphysics3d::PhysicsCommon* physicCommon);
 
+	void ApplyPhysicsFracture(DestructibleEntity* object, const glm::vec2& hitPosition, const glm::vec3& center, const glm::vec3& hitDirection);
+
 	void SetPointAmount(int amount);
 	void SetRadiusSize(float radius);
 	void SetForceStrength(float str);
@@ -38,6 +40,7 @@ public:
 	const float& GetForceStrength() { return m_forceAll_mod; };
 	const bool& GetBulletHoles() { return m_bulletHoles; };
 	const bool& GetCirclePattern() { return m_circlePattern; };
+	const int GetMaxFractureDepth() { return m_maxFratureDepth; }
 	const unsigned int seedRand(int seed = -1);
 	const unsigned int getSeed(unsigned int seed) const { return m_seed; }
 

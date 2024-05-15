@@ -3,6 +3,7 @@
 #include <reactphysics3d/collision/ConvexMesh.h>
 #include <reactphysics3d/collision/PolygonVertexArray.h>
 #include <reactphysics3d/collision/VertexArray.h>
+#include <reactphysics3d/collision/shapes/BoxShape.h>
 #include <reactphysics3d/collision/shapes/ConvexMeshShape.h>
 #include <reactphysics3d/engine/PhysicsCommon.h>
 #include <reactphysics3d/mathematics/Transform.h>
@@ -292,4 +293,34 @@ reactphysics3d::Collider* DestructibleEntity::createCollider(reactphysics3d::Phy
     ConvexMeshShape* convexMeshShape = physicsCommon->createConvexMeshShape(convexMesh, scaling);
 
     return physicalEntity()->addCollider(convexMeshShape, Transform::identity());
+}
+
+reactphysics3d::Collider* DestructibleEntity::createCollider(reactphysics3d::Vector3 scaling, reactphysics3d::PhysicsCommon* physicsCommon){
+    using namespace reactphysics3d;
+
+    const std::vector<glm::vec3> vertices = currentMesh().vertexPosition();
+
+    glm::vec3 center = currentMesh().getBarycentre();
+
+    glm::vec3 min = vertices[0];
+    glm::vec3 max = vertices[0];
+    for (size_t i = 1; i < vertices.size(); i++)
+    {
+        min.x = fminf(vertices[i].x, min.x);
+        min.y = fminf(vertices[i].y, min.y);
+        min.z = fminf(vertices[i].z, min.z);
+
+        max.x = fmaxf(vertices[i].x, max.x);
+        max.y = fmaxf(vertices[i].y, max.y);
+        max.z = fmaxf(vertices[i].z, max.z);
+    }
+
+    glm::vec3 scale = currentTransform().scale;
+
+    glm::vec3 halfSize = glm::vec3((max - min) * 0.5f);
+    glm::vec3 halfExtent = (center + halfSize) * scale;
+
+    reactphysics3d::BoxShape * boxShape = physicsCommon->createBoxShape(Vector3(halfExtent.x, halfExtent.y, halfExtent.z));
+
+    return physicalEntity()->addCollider(boxShape, Transform::identity());
 }

@@ -1,7 +1,12 @@
 
 
+#include "glm/fwd.hpp"
+#include <reactphysics3d/body/RigidBody.h>
+#include <reactphysics3d/components/RigidBodyComponents.h>
 #include <reactphysics3d/engine/PhysicsCommon.h>
 #include <reactphysics3d/engine/PhysicsWorld.h>
+#include <reactphysics3d/mathematics/Quaternion.h>
+#include <reactphysics3d/mathematics/Transform.h>
 #include <reactphysics3d/mathematics/Vector3.h>
 #include <src/entity/destructibleEntity.hpp>
 #include <src/entity/fractureGenerator.hpp>
@@ -18,7 +23,7 @@ FractureGenerator::FractureGenerator()
     m_bulletHoles = false;
     m_pointCount = 100;
     m_circleRadius = 8.0f;
-    m_forceAll_mod = 200.0f;
+    m_forceAll_mod = 100.0f;
 }
 
 FractureGenerator::~FractureGenerator()
@@ -190,7 +195,9 @@ bool FractureGenerator::Fracture(DestructibleEntity* object,
                 reactphysics3d::Transform newTransform = object->physicalEntity()->getTransform();
 
                 // Create mesh
-                glm::vec3 center = newObject->currentMesh().getBarycentre();
+                reactphysics3d::Quaternion orientation = newTransform.getOrientation().getInverse();
+                glm::vec3 center = glm::vec3(s_center, 0.0f) *
+                    glm::quat(orientation.w, orientation.x, orientation.y, orientation.z);
 
                 // Fix placement
                 // glm::vec3 sitePosition = glm::vec3(sites[i].p.x, sites[i].p.y, 0.0f);
@@ -198,16 +205,38 @@ bool FractureGenerator::Fracture(DestructibleEntity* object,
                 // newTransform.setPosition(currentPosition + reactphysics3d::Vector3(center.x, center.y, center.z));
 
                 glm::vec3 curPos = glm::vec3(currentPosition.x, currentPosition.y, currentPosition.z);
-                newObject->movement().position = curPos;
+                newObject->movement().position = curPos + (center * object->currentTransform().scale);
+                newObject->currentTransform().scale = object->currentTransform().scale;
+                newObject->updateSelfAndChild();
                 newObject->move();
                 newObject->currentMesh().color(object->currentMesh().color());
                 newObject->currentMesh().hasTexture(false);
 
                 newObject->loadEntity(world);
 
-                newObject->createCollider(physicCommon);
+                newObject->createCollider(reactphysics3d::Vector3(), physicCommon);
+
+                // Inherit forces
+                reactphysics3d::RigidBody* body = object->physicalEntity();
+                reactphysics3d::RigidBody* body2 = newObject->physicalEntity();
+                body2->setLinearVelocity(body->getLinearVelocity());
+                body2->setAngularVelocity(body->getAngularVelocity());
+
+                // Apply new forces
+                //ApplyPhysicsFracture(newObject, hitPosition, center, hitDirection);
+                float oldForce = m_forceAll_mod;
+
+                if (scale > 0.3f)
+                {
+                    m_forceAll_mod *= 10.0f;
+                    m_forceAll_mod *= std::pow(1.2f, scale);
+                }
+
+                ApplyPhysicsFracture(newObject, hitPosition, glm::vec3(s_center, 0.0f), hitDirection);
+                m_forceAll_mod = oldForce;
 
                 objectList.push_back(newObject);
+                object->physicalEntity()->setType(reactphysics3d::BodyType::STATIC);
             }
         }
 
@@ -288,6 +317,68 @@ void FractureGenerator::SetBulletHoles(bool arg)
 void FractureGenerator::SetCirclePattern(bool arg)
 {
     m_circlePattern = arg;
+}
+
+void FractureGenerator::ApplyPhysicsFracture(DestructibleEntity* object, const glm::vec2& hitPosition, const glm::vec3& center, const glm::vec3& hitDirection)
+{
+    const reactphysics3d::Transform& newTransform = object->physicalEntity()->getTransform();
+	float forceAll_mod = 10.0;
+	float forceAway_str = 1.0;
+	float forceHit_str = 10;
+	float distance = 1.0f + glm::length(center - glm::vec3(hitPosition, 0.0f));
+
+	float distanceMod = 1.0;
+	if (distanceMod > 0)
+	{
+		//forceHit_str *= 1 /  ((1 - distanceMod) * 0.0f + distanceMod * 1.0f);// glm::lerp(0.0f, 1.0f, distanceMod);
+		//forceHit_str *= 1 / std::powf(distance / 8, 1.4f);
+		//forceAway_str += std::powf(distance / 8, 1.5f);
+
+		forceAway_str *= std::fminf((1.0f + (distance / 12)), 10.0f);
+
+		forceHit_str /= distance;
+
+	}
+
+    reactphysics3d::Quaternion orientation = newTransform.getOrientation().getInverse();
+
+	glm::vec3 forceAway_dir = glm::normalize(center - glm::vec3(hitPosition, 0.0f)) *
+        glm::quat(orientation.w, orientation.x, orientation.y, orientation.z);
+	forceAway_dir *= forceAway_str;
+
+
+	//float dirRnd = (float)(rand() / (1.0f + RAND_MAX) * spinForce) - (spinForce / 2);
+	//float spinForce_mod = 0.2f * (forceAll_mod / 4);
+	// Randomize force
+	float randRange = 0.5f;
+	float forceRand = 1.0f + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
+
+	glm::vec3 spinVector = glm::normalize(glm::cross(center - glm::vec3(hitPosition, 0.0f), -hitDirection));
+	spinVector.x = (2 * (float)rand() / (float)RAND_MAX - 1) * 1.0f; // * (distance / 2);
+	spinVector.y = (2 * (float)rand() / (float)RAND_MAX - 1) * 1.0f; // * (distance / 2);
+	spinVector.z = (2 * (float)rand() / (float)RAND_MAX - 1) * 1.0f; // * (distance / 2);
+	spinVector.x *= 1.0f + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
+	spinVector.y *= 1.0f + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
+	spinVector.z *= 1.0f + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
+
+	glm::vec3 forceSpin = spinVector * (m_forceAll_mod / 40);
+	forceSpin *= (distance * 5);
+
+	glm::vec3 force = (forceAway_dir + (hitDirection * forceHit_str)) * m_forceAll_mod;
+	force.x *= 1 + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
+	force.y *= 1 + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
+	force.z *= 1 + (float)(rand() / (1.0f + RAND_MAX) * randRange) - (randRange / 2);
+
+	reactphysics3d::RigidBody* body = object->physicalEntity();
+	if (body)
+	{	
+		body->applyLocalForceAtCenterOfMass(reactphysics3d::Vector3(force.x, force.y, force.z));
+		//body->setLinearVelocity(btVector3(force.x * 0.2, force.y * 0.2, force.z * 0.2));
+		//body->setAngularVelocity(body->getAngularVelocity() + btVector3(forceSpin.x, forceSpin.y, forceSpin.z));
+		//body->setAngularVelocity(btVector3(forceSpin.x, forceSpin.y, forceSpin.z));
+		//body->applyTorqueImpulse(btVector3(spinVector.x, spinVector.y, spinVector.z));
+		body->applyLocalTorque(reactphysics3d::Vector3(forceSpin.x, forceSpin.y, forceSpin.z));
+	}
 }
 
 bool FractureGenerator::MeshFromSite(Mesh*& mesh, const float& scale, const std::vector<glm::vec2>& siteVertices)

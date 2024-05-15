@@ -1,3 +1,4 @@
+
 #include <reactphysics3d/collision/shapes/BoxShape.h>
 #include <src/entity/destructibleEntity.hpp>
 #include <src/entity/fractureGenerator.hpp>
@@ -24,7 +25,9 @@
 #include <string>
 #include <vector>
 
-Scene::Scene(){}
+Scene::Scene(){
+    m_fractureGenerator = FractureGenerator();
+}
 
 Scene::~Scene(){
     clear();
@@ -50,6 +53,20 @@ void Scene::init(){
 void Scene::update(float _deltatime, const Camera& _camera, GLuint _matrixID, GLuint _modelMatrixID, GLuint _colorID, GLuint _hasTextureID){
     // Update physics
     
+    float current_time = glfwGetTime();
+
+    if (current_time > 2.0f) {
+        std::vector<DestructibleEntity*> listObject;
+        m_fractureGenerator.Fracture(
+            &m_destructibles[0], glm::vec2(0.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 1.0f), listObject,
+            m_world, &m_physicsCommon);
+
+        for(uint i = 0; i < listObject.size(); i++){
+            m_destructibles.push_back(*listObject[i]);
+        }
+    }
+
     m_world->update(_deltatime);
 
     // Render
@@ -125,11 +142,12 @@ void Scene::setupTestScene(){
         m_entities[i].shouldRender(false);
     }
 
-    FractureGenerator frtGen = FractureGenerator();
-    DestructibleEntity test = DestructibleEntity(&frtGen);
+    DestructibleEntity test = DestructibleEntity(&m_fractureGenerator);
 
-    test.LoadBasic(2.0f);
+    test.LoadBasic(0.1f);
     test.movement().position = glm::vec3(0.0f, 40.f, 50.0f);
+    // test.currentTransform().scale = glm::vec3(0.1f, 0.1f, 0.1f);
+    test.updateSelfAndChild();
     test.move();
     test.currentMesh().color(glm::vec3(1.0f, 0.0f, 0.0f));
     test.currentMesh().hasTexture(false);
@@ -144,7 +162,7 @@ void Scene::setupTestScene(){
 
     // Height map not affected by physics
     m_heightMap.physicalEntity()->setType(BodyType::STATIC);
-    // m_destructibles[0].physicalEntity()->setType(BodyType::STATIC);
+    m_destructibles[0].physicalEntity()->setType(BodyType::STATIC);
 
 
     Collider* heightMapCollider = m_heightMap.createCollider(&m_physicsCommon);
@@ -161,16 +179,11 @@ void Scene::setupTestScene(){
     glm::vec2 max = m_destructibles[0].GetMax();
     float xLength = (max.x - min.x) / 2.0f;
     float yLenght = (max.y - min.y) / 2.0f;
-    BoxShape* boxShape = m_physicsCommon.createBoxShape(Vector3(xLength, yLenght, m_destructibles[0].getScale()+0.1f));
-
+    glm::vec3 scale = m_destructibles[0].currentTransform().scale;
+    Vector3 vScale = Vector3(scale.x, scale.y, scale.z);
+    BoxShape* boxShape = m_physicsCommon.createBoxShape(Vector3(xLength, yLenght, m_destructibles[0].getScale()+0.1f) * vScale);
+    
     Collider* testEcranCollider = m_destructibles[0].physicalEntity()->addCollider(boxShape, Transform::identity());
-
-    std::vector<DestructibleEntity*> listObject;
-    frtGen.Fracture(&m_destructibles[0], glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), listObject, m_world, &m_physicsCommon);
-
-    for(uint i = 0; i < listObject.size(); i++){
-        m_destructibles.push_back(*listObject[i]);
-    }
 
     //// Initial forces settings
     m_entities[0].physicalEntity()->applyLocalForceAtCenterOfMass(Vector3(0.0, 0.0, 150.0));
