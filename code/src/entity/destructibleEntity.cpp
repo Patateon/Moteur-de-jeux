@@ -1,4 +1,6 @@
 
+
+#include <cassert>
 #include <iostream>
 #include <reactphysics3d/collision/ConvexMesh.h>
 #include <reactphysics3d/collision/PolygonVertexArray.h>
@@ -16,7 +18,7 @@ DestructibleEntity::DestructibleEntity(FractureGenerator* fractureGen)
 {
     fractureGenRef = fractureGen;
     m_scale = 0;
-    m_lifetime = 0.0f;
+    m_lifetime = 10.0f;
 }
 
 DestructibleEntity::~DestructibleEntity()
@@ -220,6 +222,40 @@ void DestructibleEntity::meshFromPolygon() {
     currentMesh().vertexTexCoords() = newUV;
 }
 
+void DestructibleEntity::getPlan(glm::vec3 point, glm::vec3 normal){
+    assert(currentMesh().vertexPosition().size() > 3);
+
+    const glm::vec3 v0 = currentMesh().vertexPosition()[0];
+    const glm::vec3 v1 = currentMesh().vertexPosition()[1];
+    const glm::vec3 v2 = currentMesh().vertexPosition()[2];
+    
+    glm::vec3 edge0 = v2 - v0;
+    glm::vec3 edge1 = v2 - v1;
+
+    normal = glm::normalize(glm::cross(edge1, edge0));
+    point = v0;
+}
+
+glm::vec2 DestructibleEntity::projectionToPlan(glm::vec3 points){
+    assert(currentMesh().vertexPosition().size() > 3);
+
+    glm::vec2 res;
+
+    glm::vec3 A;
+    glm::vec3 normal;
+
+    getPlan(A, normal);
+
+    glm::vec3 vecPoint = points - A;
+    glm::vec3 tmp = glm::cross(vecPoint, normal);
+    glm::vec3 proj = glm::cross(normal, A);
+
+    tmp = A + proj;
+    res = glm::vec2(tmp.x, tmp.y);
+
+    return res;
+}
+
 reactphysics3d::Collider* DestructibleEntity::createCollider(reactphysics3d::PhysicsCommon* physicsCommon){
     using namespace reactphysics3d;
 
@@ -323,4 +359,11 @@ reactphysics3d::Collider* DestructibleEntity::createCollider(reactphysics3d::Vec
     reactphysics3d::BoxShape * boxShape = physicsCommon->createBoxShape(Vector3(halfExtent.x, halfExtent.y, halfExtent.z));
 
     return physicalEntity()->addCollider(boxShape, Transform::identity());
+}
+
+void DestructibleEntity::checkIfAlive(float deltatime){
+    m_lifespan += deltatime;
+    if (m_lifespan > m_lifetime){
+        disable();
+    }
 }

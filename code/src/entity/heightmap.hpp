@@ -1,14 +1,13 @@
 #pragma once
 
 // Standard library
-#include <src/entity/entity.hpp>
 #include <string>
 
 // GLM
 #include <glm/glm.hpp>
 
+#include <src/entity/entity.hpp>
 #include <src/common/mesh.hpp>
-#include <src/camera/camera.hpp>
 
 struct Rectangle{
     glm::vec3 bottomLeft;

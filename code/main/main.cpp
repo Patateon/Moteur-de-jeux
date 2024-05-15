@@ -28,6 +28,7 @@ GLFWwindow* window;
 #include <external/imgui/imgui_impl_opengl3.h>
 
 // Include Main
+#include <src/common/control.hpp>
 #include <src/actor/actor.hpp>
 #include <src/actor/objcontroller.hpp>
 #include <src/camera/camera.hpp>
@@ -86,15 +87,21 @@ int main(void)
 
     // Init Scene
     Scene currentScene;
-    currentScene.setupTestScene();
+    Camera myCamera;
+
+    Context ctx;
+    ctx.camera = &myCamera;
+    ctx.scene = &currentScene;
+    glfwSetWindowUserPointer(window, &ctx);
 
     // Init ImGUI
     initImgui();
 
     // Init Camera
-    Camera myCamera;
-    //[Camera] Aller plus loin : loader une position, rotation et fov ?
     myCamera.init();
+
+    // Setup Scene
+    currentScene.setupTestScene();
 
     // For speed computation
     double lastTime = glfwGetTime();

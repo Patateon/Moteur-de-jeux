@@ -26,6 +26,10 @@ Entity::Entity(std::vector<glm::vec3> vertices, std::vector<unsigned short> indi
     m_currentMesh = Mesh(vertices, indices);
 }
 
+Entity::~Entity(){
+    clear();
+}
+
 void Entity::move(){
     this->m_currentTransform.translation = this->m_movement.position;
     this->updateSelfAndChild();
@@ -99,6 +103,16 @@ void Entity::updateViewAndDraw(const Camera& _camera, reactphysics3d::PhysicsWor
     }else{
         m_physicalEntity->setIsActive(false);        
     }
+}
+
+void Entity::enable(){
+    shouldRender(true);
+    physicalEntity()->setIsActive(true);
+}
+
+void Entity::disable(){
+    shouldRender(false);
+    physicalEntity()->setIsActive(false);
 }
 
 void Entity::clear(){

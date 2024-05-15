@@ -64,6 +64,8 @@ add_executable(main
     main/main.cpp
 
     # Main components
+    src/common/control.hpp
+    src/common/control.cpp
     src/common/jc_voronoi_clip.h
     src/common/jc_voronoi.h
     src/common/mesh.cpp

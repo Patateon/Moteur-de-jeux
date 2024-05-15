@@ -235,8 +235,9 @@ bool FractureGenerator::Fracture(DestructibleEntity* object,
                 ApplyPhysicsFracture(newObject, hitPosition, glm::vec3(s_center, 0.0f), hitDirection);
                 m_forceAll_mod = oldForce;
 
+                newObject->SetDestroyed(true);
+
                 objectList.push_back(newObject);
-                object->physicalEntity()->setType(reactphysics3d::BodyType::STATIC);
             }
         }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+// #include "src/entity/scene.hpp"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -8,20 +9,11 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/norm.hpp>
 
+// #include <src/entity/scene.hpp>
+
 #define MAX_PITCH 89.0f
 
 const static float epsilon_camera = 0.1f;
-
-//// Fonction statique pour la gestion des contrôles de la caméra
-
-// Pour les contrôles "fluides" se faisant en même temps que le rendu (ex : WASD/ZQSD, etc.)
-static void processInput(GLFWwindow* window);
-
-// Callback pour les input plus précis (Toggle un truc, etc.)
-static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-// Callback pour la position du cursor (ex : rotation de la caméra, etc.)
-static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 
 class Camera
 {

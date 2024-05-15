@@ -16,6 +16,7 @@ private:
 	glm::vec2 max;
 
 	float m_lifetime = 0.0f;
+	float m_lifespan = 0.0f;
 	float m_scale = 0.0f;
 	bool m_destroyed = false;
 	int m_fractureDepth = 0;
@@ -37,6 +38,9 @@ public:
 
 	void CalculateMinMax();
 	void meshFromPolygon();
+	void checkIfAlive(float deltatime);
+	void getPlan(glm::vec3 points, glm::vec3 normal);
+	glm::vec2 projectionToPlan(glm::vec3 points);
 
 	reactphysics3d::Collider* createCollider(reactphysics3d::PhysicsCommon* physicsCommon);
 	reactphysics3d::Collider* createCollider(reactphysics3d::Vector3 scaling, reactphysics3d::PhysicsCommon* physicsCommon);
