@@ -83,7 +83,7 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods){
         scene->entities().back().loadEntity(world);
         
         float radius = 0.5f;
-        float strength = 1000.f;
+        float strength = 5000.f;
         glm::vec3 weightedFront = strength * front;
         SphereShape* sphereShape = physicalCommon->createSphereShape(radius);
         Collider* entityCollider = scene->entities().back().physicalEntity()->addCollider(sphereShape, Transform::identity());

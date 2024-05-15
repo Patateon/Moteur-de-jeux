@@ -221,7 +221,7 @@ void Scene::setupTestScene(){
     //// Initial forces settings
     m_entities[0].physicalEntity()->applyLocalForceAtCenterOfMass(Vector3(0.0, 0.0, 150.0));
 
-    m_destructibles[0].disable();
+    // m_destructibles[0].disable();
     // m_heightMap.disable();
 }
 /*
