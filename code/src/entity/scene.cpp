@@ -36,7 +36,7 @@ Scene::~Scene(){
 void Scene::init(){
 
     m_world = m_physicsCommon.createPhysicsWorld();
-    // m_world->setGravity(reactphysics3d::Vector3(0.0, -9.81, 0.0));
+    m_world->setGravity(reactphysics3d::Vector3(0.0, 3 * -9.81, 0.0));
     
     // Load every entities
     load();
@@ -133,7 +133,7 @@ void Scene::setupTestScene(){
     rec.right = glm::vec3(150.0f, 0.0f, 0.0f);
     rec.up = glm::vec3(0.0f, 0.0f, 150.0f);
     m_heightMap = HeightMap(rec, 30, 30, "../assets/map/heightmap-1024x1024.png");
-    m_heightMap.maxHeight(40.f);
+    m_heightMap.maxHeight(20.f);
     m_heightMap.build(30, 30);
     m_heightMap.currentMesh().hasTexture(false);
     m_heightMap.currentMesh().color(glm::vec3(0.30f, 0.30f, 0.30f));
@@ -173,7 +173,7 @@ void Scene::setupTestScene(){
 
     test.LoadBasic(0.1f);
     test.movement().position = glm::vec3(0.0f, 40.f, 50.0f);
-    // test.currentTransform().scale = glm::vec3(0.1f, 0.1f, 0.1f);
+    test.currentTransform().scale = glm::vec3(0.7f, 0.7f, 0.7f);
     test.updateSelfAndChild();
     test.move();
     test.currentMesh().color(glm::vec3(1.0f, 0.0f, 0.0f));
@@ -220,6 +220,9 @@ void Scene::setupTestScene(){
 
     //// Initial forces settings
     m_entities[0].physicalEntity()->applyLocalForceAtCenterOfMass(Vector3(0.0, 0.0, 150.0));
+
+    m_destructibles[0].disable();
+    // m_heightMap.disable();
 }
 /*
 void Scene::initSkybox() {
@@ -250,6 +253,7 @@ void Scene::onContact(const CollisionCallback::CallbackData& callbackData){
         rp3d::Body * body2 = contactPair.getBody2();
 
         int fstBody = 0;
+        reactphysics3d::Vector3 bodyPos = body2->getTransform().getPosition();
 
         int indexDestructible = getIndexDestructible(body1->getEntity().id);
         if (indexDestructible < 0){
@@ -258,6 +262,7 @@ void Scene::onContact(const CollisionCallback::CallbackData& callbackData){
             if (indexDestructible < 0)
                 break;
         }else{
+            bodyPos = body1->getTransform().getPosition();
             fstBody = 1;
         }
 
@@ -284,7 +289,7 @@ void Scene::onContact(const CollisionCallback::CallbackData& callbackData){
 
             std::vector<DestructibleEntity*> listObjects;
 
-            // fractureGenerator().seedRand();
+            fractureGenerator().seedRand();
 
             // Calculate hitpoint
             reactphysics3d::Vector3 contact = contactBarycentre - destructibles()[indexDestructible].physicalEntity()->getTransform().getPosition();
@@ -292,9 +297,12 @@ void Scene::onContact(const CollisionCallback::CallbackData& callbackData){
             reactphysics3d::Quaternion orientation = destructibles()[indexDestructible].physicalEntity()->getTransform().getOrientation();
             glm::vec3 glmContact = glm::vec3(contact.x, contact.y, contact.z) *
                 glm::quat(orientation.w, orientation.x, orientation.y, orientation.z);
+
+            glm::vec3 direction = glm::vec3();
+            // direction = glm::vec3(bodyPos.x, bodyPos.y, bodyPos.z) - glmContact;
             
             if (fractureGenerator().Fracture(&(destructibles()[indexDestructible]),
-                glm::vec2(glmContact.x, glmContact.y), glm::vec3(0.0f, 0.0f, 0.0f), listObjects,
+                glm::vec2(glmContact.x, glmContact.y), direction, listObjects,
                 world(), physicsCommon())){
                 destructibles()[indexDestructible].disable();
                 for(uint i = 0; i < listObjects.size(); i++){

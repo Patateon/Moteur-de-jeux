@@ -1,5 +1,6 @@
 
 
+#include "glm/detail/func_geometric.hpp"
 #include "glm/fwd.hpp"
 #include <reactphysics3d/body/RigidBody.h>
 #include <reactphysics3d/components/RigidBodyComponents.h>
@@ -15,7 +16,7 @@
 FractureGenerator::FractureGenerator()
 {
     m_seed = 0;
-    m_maxFratureDepth = 20;
+    m_maxFratureDepth = 0;
 
     // Fracture settings
     m_voronoiType = VoronoiType::FORTUNESWEEP;
@@ -189,6 +190,8 @@ bool FractureGenerator::Fracture(DestructibleEntity* object,
                 newObject->SetPolygon(siteVertices);
                 newObject->SetScale(scale);
                 newObject->SetFractureDepth(fractureDepth + 1);
+                if(newObject->GetFractureDepth() > m_maxFratureDepth)
+                    newObject->SetDestroyed(true);
 
                 newObject->currentMesh() = *newMesh;
 
@@ -214,7 +217,7 @@ bool FractureGenerator::Fracture(DestructibleEntity* object,
 
                 newObject->loadEntity(world);
 
-                newObject->createCollider(reactphysics3d::Vector3(), physicCommon);
+                newObject->createCollider(/* reactphysics3d::Vector3(), */ physicCommon);
 
                 // Inherit forces
                 reactphysics3d::RigidBody* body = object->physicalEntity();
@@ -235,7 +238,7 @@ bool FractureGenerator::Fracture(DestructibleEntity* object,
                 ApplyPhysicsFracture(newObject, hitPosition, glm::vec3(s_center, 0.0f), hitDirection);
                 m_forceAll_mod = oldForce;
 
-                newObject->SetDestroyed(true);
+                // newObject->SetDestroyed(true);
 
                 objectList.push_back(newObject);
             }
