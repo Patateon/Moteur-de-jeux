@@ -34,6 +34,7 @@ private:
 public:
     // Constructor
     Mesh(){}
+    Mesh(const std::string & filename);
     Mesh(
         std::vector<glm::vec3> vertices,
         std::vector<unsigned short> indices
@@ -49,6 +50,7 @@ public:
     std::vector<unsigned short> & triangleIndices() {return m_triangleIndices;}
 
     // Recompute normals and texture coordinates from vertex
+    void recomputeNormalsAndTexCoords();
     void recomputeNormals();
     void recomputeTextureCoordinates();
 

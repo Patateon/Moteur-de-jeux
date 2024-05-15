@@ -3,9 +3,6 @@
 // Standard libraries
 #include <vector>
 
-// GLM
-#include <glm/glm.hpp>
-
 // ReactPhysics3D
 #include <reactphysics3d/reactphysics3d.h>
 

@@ -64,6 +64,10 @@ add_executable(main
     main/main.cpp
 
     # Main components
+    src/common/control.hpp
+    src/common/control.cpp
+    src/common/jc_voronoi_clip.h
+    src/common/jc_voronoi.h
     src/common/mesh.cpp
     src/common/mesh.hpp
     src/common/objloader.cpp
@@ -80,10 +84,16 @@ add_executable(main
     src/common/vboindexer.hpp
 
     # Entity Components
-    src/entity/entity.hpp
+    src/entity/destructibleEntity.cpp
+    src/entity/destructibleEntity.hpp
     src/entity/entity.cpp
+    src/entity/entity.hpp
+    src/entity/fractureGenerator.cpp
+    src/entity/fractureGenerator.hpp
     src/entity/heightmap.cpp
     src/entity/heightmap.hpp
+    src/entity/scene.cpp
+    src/entity/scene.hpp
 
     # Physic engine
     src/physics/physicworld.cpp
@@ -91,6 +101,7 @@ add_executable(main
     src/physics/transform.cpp
     src/physics/transform.hpp
 
+    # Actor components (not used)
     src/actor/actor.cpp
     src/actor/actor.hpp
     src/actor/objcontroller.cpp

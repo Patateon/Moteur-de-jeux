@@ -1,3 +1,4 @@
+#include <reactphysics3d/engine/PhysicsCommon.h>
 #include <src/common/mesh.hpp>
 #include <src/entity/heightmap.hpp>
 #include <src/common/stb_image.h>
@@ -6,25 +7,30 @@
 using namespace std;
 using namespace glm;
 
+HeightMap::HeightMap(){}
 
 HeightMap::HeightMap(Rectangle map){
     m_map = map;
 }
 
-HeightMap::HeightMap(Rectangle map, int hRes, int vRes, std::string path){
+HeightMap::HeightMap(Rectangle map, int hRes, int vRes, const std::string & filename){
     m_map = map;
-    m_heightMapTexture = path;
+    m_heightMapTexture = filename;
 
     build(hRes, vRes);
 }
 
 void HeightMap::build(int hRes, int vRes){
+    m_res.h = hRes;
+    m_res.v = vRes;
+
     vector<unsigned short> triangles;
     vector<vec3> vertices;
+    vector<vec2> texCoords;
 
-    generateSurface(&triangles, &vertices, m_map, hRes, vRes);
+    generateSurface(&triangles, &vertices, &texCoords, m_map, hRes, vRes);
     currentMesh() = Mesh(vertices, triangles);
-    currentMesh().recomputeTextureCoordinates();
+    currentMesh().vertexTexCoords() = texCoords;
     applyHeightMap();
     currentMesh().recomputeNormals();
 }
@@ -55,12 +61,79 @@ void HeightMap::applyHeightMap() {
     }
 }
 
+reactphysics3d::Collider* HeightMap::createCollider(reactphysics3d::PhysicsCommon* _physicsCommon){
+
+    using namespace reactphysics3d;
+
+    float heightValue[m_res.h * m_res.v];
+
+    float minHeight = FLT_MAX;
+    float maxHeight = FLT_MIN;
+
+    
+    for(uint i = 0; i < currentMesh().vertexPosition().size(); i++){
+        heightValue[i] = currentMesh().vertexPosition()[i].y;
+        minHeight = minHeight < heightValue[i] ? minHeight : heightValue[i]; 
+        maxHeight = maxHeight > heightValue[i] ? maxHeight : heightValue[i]; 
+    }
+
+    std::vector<reactphysics3d::Message> logHeightMap;
+    HeightField* heightField = _physicsCommon->createHeightField(
+        m_res.h, m_res.v, heightValue,
+        reactphysics3d::HeightField::HeightDataType::HEIGHT_FLOAT_TYPE,
+        logHeightMap);
+
+    
+
+    // Display the messages (info, warning and errors)
+    if (logHeightMap.size() > 0) {
+    
+        for (const rp3d::Message& message: logHeightMap) {
+    
+            std::string messageType;
+    
+            switch(message.type) {
+                case rp3d::Message::Type::Information:
+                    messageType = "info";
+                    break;
+                case rp3d::Message::Type::Warning:
+                    messageType = "warning";
+                    break;
+                case rp3d::Message::Type::Error:
+                    messageType = "error";
+                    break;
+            }
+    
+            std::cout << "Message (" << messageType << "): " << message.text << std::endl;
+            return nullptr;
+        }
+    }
+    
+    // Make sure there was no errors during the height field creation
+    assert(heightField != nullptr);
+
+    HeightFieldShape* heightMapShape = _physicsCommon->createHeightFieldShape(heightField, Vector3(1.0f, 1.f, 1.0f));
+
+    // Détermine le bon facteur d'échelle par rapport aux dimensions de la heightMap
+    AABB heightMapBound = heightMapShape->getLocalBounds();
+    float heightMapScaleX = (length(this->map().right) / 2.0f) / heightMapBound.getMax().x;
+    float heightMapScaleZ = (length(this->map().up) / 2.0f) / heightMapBound.getMax().z;
+    Vector3 heightMapScale = Vector3(heightMapScaleX, 1.0f, heightMapScaleZ);
+    heightMapShape->setScale(heightMapScale);
+
+    // Décale la collision de la heightMap pour la recentrer (rp3d recentre automatiquement la height map il faut donc corriger cela)
+    Transform heightMapTransform = Transform(Vector3(0.0f, heightMapBound.getMax().y, 0.0f), Quaternion::identity());
+
+    return this->physicalEntity()->addCollider(heightMapShape, heightMapTransform);
+}
+
 // À partir d'un rectangle et d'une résolution, 
 // génère les sommets et les triangles
 // d'une surface plane correspondante
 void HeightMap::generateSurface(
     vector<unsigned short> * indices_surface,
     vector<vec3> * vertices_surface,
+    vector<vec2> * tex_coords,
     Rectangle rectangle,
     int horizontal_res, int vertical_res){
     unsigned short v0, v1, v2, v3;
@@ -73,7 +146,9 @@ void HeightMap::generateSurface(
             float horizontal_step = (float) j / (float) (horizontal_res-1);
             float vertical_step = (float) i / (float) (vertical_res-1);
             vec3 new_points = rectangle.bottomLeft + (rectangle.right*horizontal_step) + (rectangle.up*vertical_step);
+            vec2 new_texCoords = vec2(1.0f - ((float) i / (float) (vertical_res-1)), (float) j / (float) (horizontal_res-1));
             vertices_surface->push_back(new_points);
+            tex_coords->push_back(new_texCoords);
         }
     }
 
