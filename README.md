@@ -4,6 +4,12 @@ Projet de moteur de jeux dans le cadre de l'UE Moteur de jeux [HAI819I](https://
 
 # Installation et Utilisation
 
+Pré-requis :
+
+Librarie ReactPhysics3D :
+
+https://www.reactphysics3d.com/documentation/
+
 Étape 0 :
 Ce placer dans le dossier ```code``` :
 ```console
