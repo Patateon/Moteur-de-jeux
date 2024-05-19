@@ -224,7 +224,7 @@ GLFWwindow* initWindow()
 
 
     // Open a window and create its OpenGL context
-    GLFWwindow* createdWindow = glfwCreateWindow(1500, 1000, "TP Camera", NULL, NULL);
+    GLFWwindow* createdWindow = glfwCreateWindow(1500, 1000, "Superbe moteur physique et non pas TP Camera", NULL, NULL);
     if (createdWindow != NULL) {
         glfwMakeContextCurrent(createdWindow);
         glfwSetFramebufferSizeCallback(createdWindow, framebuffer_size_callback);
